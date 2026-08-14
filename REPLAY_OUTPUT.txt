@@ -1,0 +1,25 @@
+== mod-4 no-lift certificates ==
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
+VALID alpha_mod4_result_generic.json: XOR of 523 equations gives 0 = 1
+VALID no-lift certificate: XOR of 523 equations gives 0 = 1 over F2 (2256 lift variables)
+VALID flips_mod4_result.json: XOR of 292 equations gives 0 = 1
+VALID no-lift certificate: XOR of 292 equations gives 0 = 1 over F2 (2256 lift variables)
+MOD4 REGENERATION MATCH
+== F3 support obstructions ==
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
+VALID: base support and all 2256 single-entry support edits are obstructed over F3; 70 edits required dedicated certificates, the others preserve the base contradiction.
+VALID: base support and all 2256 single-entry support edits are obstructed over F3; 113 edits required dedicated certificates, the others preserve the base contradiction.
+VALID independent replay r47_alphatensor_f2_factors.json
+VALID independent replay r47_flips_data.json
+{
+  "source": "f3/data/r47_alphatensor_f2_factors.json",
+  "source_sha256": "48cc645eaa0b37cf39fe1f079354e06bb6448f2c837ac965993ec43d292b9ed7",
+  "distance1": "f3/certificates/alpha_distance1_f3_obstruction.json",
+  "first_edits": 70,
+  "ordered_second_edits_requiring_fresh_check": 15075,
+  "elapsed_seconds": 18.345645904541016,
+  "claim": "all support patterns at factor-entry Hamming distance at most 2 have a necessary F3 parity contradiction"
+}
+consistent_pair_count 0
