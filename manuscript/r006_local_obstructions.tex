@@ -1,0 +1,180 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage[T1]{fontenc}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+
+\title{Exact Local Obstructions Around Rank-47\\$4\times4$ Matrix-Multiplication Schemes}
+\author{Unsolved Labs\\\small Frontier-AI-generated research release R006}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Rank-47 decompositions of the $4\times4$ matrix-multiplication tensor are known in characteristic two, while no rank-47 construction is presently established over the rationals or characteristic zero.  This note gives two deliberately local, computer-assisted nonexistence results around two frozen public binary rank-47 decompositions, one originating from AlphaTensor and one from the flip-graph line of work.  First, neither frozen binary scheme admits a coefficient-wise lift to $\Z/4\Z$.  The obstruction reduces exactly to an inconsistent linear system over $\F_2$ and is witnessed by compact XOR certificates.  Second, over $\F_3$, neither frozen zero/nonzero factor-entry support nor any support at factor-entry Hamming distance at most two admits nonzero coefficients satisfying the matrix-multiplication tensor equations.  The latter claim is certified by necessary sign-parity equations and a complete finite sweep of all one- and two-entry support changes.  These results are representation-specific local obstructions; they do not prove tensor rank at least 48 over $\F_3$, $\mathbb{Q}$, $\mathbb{R}$, or $\mathbb{C}$.
+\end{abstract}
+
+\section{Introduction}
+
+The bilinear complexity of matrix multiplication can be formulated as a tensor-rank problem.  A rank-$R$ decomposition of the $n\times n$ matrix-multiplication tensor gives an algorithm using $R$ scalar multiplications.  AlphaTensor produced a rank-47 decomposition for $4\times4$ multiplication in arithmetic modulo two, improving the two-level Strassen count of 49 in that setting~\cite{alphatensor}.  Flip-graph methods provide another systematic route for exploring low-rank matrix-multiplication schemes~\cite{flipgraphs}.  Over coefficient rings of characteristic different from two, public rank-48 constructions are known; in particular a rational 48-multiplication construction has been reported~\cite{rank48rational}.  The existence of a rank-47 scheme in characteristic zero remains open.
+
+This release asks two narrower questions about two fixed binary rank-47 decompositions.  Can either decomposition be lifted coefficient-by-coefficient from $\F_2$ to $\Z/4\Z$?  And, if one keeps (or slightly perturbs) its zero/nonzero factor-entry support, can one choose nonzero coefficients in $\F_3$ so that the tensor equations hold?  Both questions admit exact finite certificates.
+
+The proof architecture intentionally separates \emph{search} from \emph{verification}.  The public claims depend only on frozen factor data, compact contradiction certificates, exact arithmetic, and deterministic checking code.  No floating-point threshold is used.  The repository also records the precise limitations of the result and the trust boundary of the machine verification.
+
+\section{Matrix-multiplication tensor and frozen schemes}
+
+Let $A=(a_{ij})$ and $B=(b_{jk})$ be $4\times4$ matrices.  We index the 16 coordinates of the first factor by pairs $(i,j)$, the second by $(j,k)$, and the output dual coordinate by $(k,i)$.  Thus the matrix-multiplication tensor $T\in K^{16}\otimes K^{16}\otimes K^{16}$ over a coefficient ring or field $K$ has entries
+\[
+ T_{(i,j),(j',k),(k',i')}=
+ \begin{cases}
+  1,&j=j',\ k=k',\ i=i',\\
+  0,&\text{otherwise.}
+ \end{cases}
+\]
+With the repository's flattened indices $a=4i+j$, $b=4j'+k$, and $c=4k'+i'$, this is exactly the target convention implemented by the independent seed verifier.
+
+A rank-$R$ scheme is a factorization
+\[
+ T=\sum_{r=1}^{R}U_r\otimes V_r\otimes W_r,
+\]
+where $U_r,V_r,W_r\in K^{16}$.  R006 freezes two $R=47$ schemes over $\F_2$.  Their normalized factor files are part of the immutable artifact payload, and their canonical SHA-256 values are recorded in \texttt{PROVENANCE.md}.  Before using either seed, the release verifier checks all $16^3=4096$ tensor coordinates exactly.
+
+\section{Coefficient-wise lifting to $\Z/4\Z$}
+
+Fix one of the binary schemes and write its entries as $u,v,w\in\{0,1\}$.  Every coefficient-wise lift to $\Z/4\Z$ reducing to the same binary data has the form
+\[
+ \widetilde u=u+2x,\qquad \widetilde v=v+2y,\qquad \widetilde w=w+2z,
+\]
+with correction bits $x,y,z\in\F_2$.  Expanding a rank-one contribution modulo four gives
+\[
+ (u+2x)(v+2y)(w+2z)
+ \equiv uvw+2(xvw+uyw+uvz)\pmod 4.
+\]
+All terms containing two or three corrections vanish modulo four.
+
+For a tensor coordinate $e=(a,b,c)$, let
+\[
+ S_e=\sum_{r=1}^{47}U_r(a)V_r(b)W_r(c)\in\Z
+\]
+be the integer sum of binary monomials and let $t_e\in\{0,1\}$ be the target tensor entry.  Since the frozen seed is correct over $\F_2$, $S_e-t_e$ is even.  Dividing the modulo-four equation by two and reducing modulo two therefore yields a linear equation in the $3\cdot47\cdot16=2256$ correction bits:
+\[
+ \sum_r\bigl(X_r(a)V_r(b)W_r(c)+U_r(a)Y_r(b)W_r(c)+U_r(a)V_r(b)Z_r(c)\bigr)
+ = \frac{t_e-S_e}{2}\pmod 2.
+\]
+The sign on the right is immaterial in characteristic two.
+
+\begin{lemma}[XOR contradiction certificate]
+If a subset of these linear equations has coefficient-vector XOR equal to zero and right-hand-side XOR equal to one, then the coefficient-wise $\Z/4\Z$ lifting system is inconsistent.
+\end{lemma}
+\begin{proof}
+XORing the selected equations is addition in $\F_2$.  Any common solution would satisfy the sum, whose left side is zero while its right side is one, a contradiction.
+\end{proof}
+
+The frozen AlphaTensor certificate selects 523 tensor equations; the frozen Kauers--Moosbauer certificate selects 292.  The release reconstructs the complete 4096-by-2256 linearized systems, regenerates the contradiction certificates deterministically, and replays each certificate with two implementations that use different internal representations.
+
+\begin{theorem}[Local mod-4 no-lift result]
+Neither frozen binary rank-47 scheme in R006 admits a coefficient-wise lift to $\Z/4\Z$ that reduces to the frozen scheme modulo two and satisfies all 4096 matrix-multiplication tensor equations.
+\end{theorem}
+\begin{proof}
+The exact seed checks establish the premise that each frozen input is a valid $\F_2$ decomposition.  The expansion above proves that every coefficient-wise $\Z/4\Z$ lift would induce a solution of the corresponding $\F_2$ linearized system.  The two checked XOR certificates prove those systems inconsistent.  Therefore no such lifts exist.
+\end{proof}
+
+\section{Necessary sign-parity equations over $\F_3$}
+
+Now fix only a zero/nonzero support for the three factor matrices.  Every nonzero coefficient of $\F_3$ is $+1$ or $-1$.  Associate a sign bit to each nonzero factor entry so that the coefficient is $(-1)^x$.  At a tensor coordinate, suppose exactly $k$ rank-one monomials are active on the chosen support and $n$ of those monomials have negative sign.  Their sum in $\F_3$ is
+\[
+ k-2n\equiv k+n\pmod 3.
+\]
+If the target value is $t\in\{0,1\}$, a necessary condition is therefore
+\[
+ n\equiv t-k\pmod 3.
+\]
+When the residue determines a unique integer $n\in\{0,\ldots,k\}$, the parity of $n$ is forced.  R006 uses the sufficient uniqueness test $k\le4$, $n_0=(t-k)\bmod3$, $n_0\le k$, and $n_0+3>k$.
+
+The sign of an active rank-one monomial is the product of one sign from each factor, hence the XOR of three factor-entry sign bits.  Taking the parity of the number of negative active monomials gives a linear equation over $\F_2$ in those sign bits.  Coordinates with $k=0$ and target $1$ yield an immediate contradiction.
+
+\begin{lemma}[Soundness of the F3 parity obstruction]
+For a fixed support, every assignment of nonzero $\F_3$ coefficients satisfying all matrix-multiplication tensor equations satisfies every sign-parity equation constructed by the verifier.  Consequently, an XOR contradiction among those parity equations proves that no such $\F_3$ coefficient assignment exists on that support.
+\end{lemma}
+\begin{proof}
+Each nonzero factor coefficient is uniquely $\pm1$.  At every coordinate used by the verifier, the target equation forces the unique admissible number of negative active monomials modulo three and hence its parity.  Replacing each monomial sign by the XOR of its three factor sign bits gives the stated linear equation.  Any genuine tensor decomposition would satisfy all these necessary equations.  An inconsistent subsystem therefore excludes a genuine decomposition.
+\end{proof}
+
+\section{Complete support-distance-two audit}
+
+A \emph{factor-entry support toggle} changes the zero/nonzero status of exactly one of the $3\cdot47\cdot16=2256$ factor entries.  Hamming distance is measured in this frozen coordinate representation.
+
+For each seed, the release contains a base XOR contradiction and dedicated contradiction certificates for precisely those single toggles that alter a monomial in the base certificate.  A toggle that cannot affect any monomial used by a certificate leaves that certificate literally unchanged.
+
+For distance two, the strengthened release verifier considers all 2256 possible first toggles.  After the first toggle it selects either the unchanged base certificate or the corresponding dedicated single-toggle certificate and checks that certificate directly.  It then visits every distinct second toggle with larger canonical index, so every unordered pair of support toggles appears exactly once.  If the second toggle cannot affect a monomial in the current certificate, the pair is certified immediately by preservation of that contradiction.  Otherwise the verifier applies both toggles and rebuilds all available necessary sign-parity equations over all 4096 tensor coordinates, performing exact Gaussian elimination over $\F_2$ to search for a fresh contradiction.
+
+Thus the sweep covers
+\[
+ \binom{2256}{2}=2{,}543{,}640
+\]
+unordered distance-two supports per frozen seed.  This all-first-edit construction is important: it also covers pairs of zero-to-one toggles that can jointly create an active monomial even though neither toggle alone changes the original base certificate.
+
+\begin{theorem}[Local F3 support obstruction]
+For each frozen seed in R006, neither the original factor-entry support nor any support at Hamming distance one or two admits an assignment of nonzero $\F_3$ coefficients satisfying the $4\times4$ matrix-multiplication tensor equations, provided the complete release verifier terminates with no parity-consistent pair.
+\end{theorem}
+\begin{proof}
+The base and all distance-one supports have checked XOR contradiction certificates.  The complete distance-two algorithm partitions every unordered two-toggle support into two cases.  In the first case, a checked contradiction certificate survives the second toggle unchanged.  In the second, the verifier explicitly rebuilds a sound necessary parity system for the modified support and checks that exact elimination finds a contradiction.  If no pair survives this process without a contradiction, the preceding lemma excludes an $\F_3$ coefficient assignment on every support in the radius-two ball.
+\end{proof}
+
+\section{Verification and trust boundary}
+
+The canonical verification entry point is
+\begin{verbatim}
+./verify_release.sh
+\end{verbatim}
+from a clean checkout.  It first verifies SHA-256 digests of the immutable compressed factor/certificate payloads, then restores the exact byte streams in a temporary directory.  It checks both frozen rank-47 schemes against all 4096 tensor equations, replays and regenerates the mod-4 certificates, replays the F3 base/distance-one certificates in two implementations, and runs the complete distance-two sweep described above.  GitHub Actions executes the same command under Python 3.12 after syntax-checking all verifier sources.
+
+The final proof does not trust the search process that originally found the binary decompositions or the contradiction certificates.  It trusts the frozen factor bytes, standard integer/bit arithmetic and Python runtime semantics, the public checker source, and the correctness of the mathematical reductions proved in this note.  The mod-4 certificate is replayed through two materially different accumulator representations.  The F3 base/distance-one certificates have two Python implementations of the same parity mathematics; the complete distance-two traversal currently has one implementation.  This remaining implementation-diversity limitation is stated explicitly in \texttt{VERIFICATION.md}.
+
+A full Lean formalization is not part of this release.  The load-bearing finite claims have small exact certificates and exhaustive replay, while introducing an untested proof-assistant layer would not itself reduce the present trust boundary.  The algebraic linearization lemma, parity-obstruction lemma, XOR-unsatisfiability lemma, and certificate-preservation lemma are natural future formalization targets; the repository records this boundary in \texttt{FORMALIZATION\_SCOPE.md}.
+
+\section{Scope, provenance, and limitations}
+
+The theorem is local to two frozen normalized binary factorizations and to the stated coordinate representation.  It does not rule out a rank-47 $\F_3$ decomposition at support distance at least three, a different binary rank-47 scheme with different lifting behavior, or an odd-characteristic/characteristic-zero rank-47 scheme unrelated to these reductions.  In particular, it is not a proof that the tensor rank of $4\times4$ matrix multiplication is at least 48 over $\F_3$, $\mathbb Q$, $\mathbb R$, or $\mathbb C$.
+
+The AlphaTensor provenance is anchored in the published rank-47 characteristic-two construction and its public factorization repository~\cite{alphatensor,alphatensorcode}.  The second seed belongs to the public flip-graph line of matrix-multiplication factorizations~\cite{flipgraphs}.  Because the original R006 release did not record an immutable upstream file/commit for each normalized seed, the authoritative objects for this release are the frozen factor payloads and SHA-256 values in the R006 repository.  \texttt{PROVENANCE.md} distinguishes this frozen-input identity from broader upstream-source context rather than guessing an unrecorded historical commit.
+
+Independent specialist review remains pending.  The computational proof is public and replayable, but this status should not be described as peer review.
+
+\section*{AI-origin disclosure}
+R006 is an Unsolved Labs research release generated with frontier AI.  Correctness claims are based on the public mathematical argument and exact machine-checkable artifacts in the repository, not on an assertion of conventional human authorship.  No private model conversation or hidden reasoning is part of the research record.
+
+\begin{thebibliography}{9}
+\bibitem{alphatensor}
+A. Fawzi et al.,
+\emph{Discovering faster matrix multiplication algorithms with reinforcement learning},
+Nature 610 (2022), 47--53.
+\url{https://doi.org/10.1038/s41586-022-05172-4}.
+
+\bibitem{alphatensorcode}
+Google DeepMind,
+\emph{AlphaTensor public algorithms and code repository}.
+\url{https://github.com/google-deepmind/alphatensor}.
+
+\bibitem{flipgraphs}
+M. Kauers and J. Moosbauer,
+\emph{Flip Graphs for Matrix Multiplication},
+Proceedings of ISSAC 2023; arXiv:2212.01175.
+\url{https://arxiv.org/abs/2212.01175}.
+
+\bibitem{rank48rational}
+J.-G. Dumas, C. Pernet, and A. Sedoglavic,
+\emph{A non-commutative algorithm for multiplying $4\times4$ matrices using 48 non-complex multiplications},
+arXiv:2506.13242 (2025).
+\url{https://arxiv.org/abs/2506.13242}.
+\end{thebibliography}
+
+\end{document}
