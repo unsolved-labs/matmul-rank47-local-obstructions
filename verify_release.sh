@@ -52,11 +52,7 @@ for path,dedicated in zip(sys.argv[1:],expected_dedicated):
  assert x['first_edits_using_dedicated_certificate']==dedicated
  assert x['distance2_pairs_total']==2256*2255//2
  assert x.get('linearly_consistent_pairs',[])==[]
- print(
-   'COMPLETE DISTANCE-2 SWEEP', path,
-   'fresh_checks=',x['distance2_pairs_requiring_fresh_global_parity_check'],
-   'preserved=',x['distance2_pairs_certified_by_preserved_certificate']
- )
+ print('COMPLETE DISTANCE-2 SWEEP',path,'fresh_checks=',x['distance2_pairs_requiring_fresh_global_parity_check'],'preserved=',x['distance2_pairs_certified_by_preserved_certificate'])
 PY
 
 printf '%s\n' '== complete F3 support distance = 2 sweep (independent C++20) =='
@@ -71,5 +67,30 @@ cat "$tmp/alpha_cxx.out"
 cat "$tmp/flips_cxx.out"
 grep -qx 'INDEPENDENT CXX R006 F3 DISTANCE-2 CHECK PASSED' <(tail -n 1 "$tmp/alpha_cxx.out")
 grep -qx 'INDEPENDENT CXX R006 F3 DISTANCE-2 CHECK PASSED' <(tail -n 1 "$tmp/flips_cxx.out")
+
+printf '%s\n' '== cross-implementation distance-two accounting =='
+python3 - "$tmp/alpha_d2.json" "$tmp/alpha_cxx.out" "$tmp/flips_d2.json" "$tmp/flips_cxx.out" <<'PY'
+import json,sys
+
+def cxx(path):
+    out={}
+    for line in open(path):
+        p=line.split()
+        if len(p)==2:
+            try: out[p[0]]=int(p[1])
+            except ValueError: pass
+    return out
+
+for jpath,cpath in ((sys.argv[1],sys.argv[2]),(sys.argv[3],sys.argv[4])):
+    j=json.load(open(jpath)); c=cxx(cpath)
+    assert c['all_first_edits']==j['all_first_edits']
+    assert c['dedicated_first_certificates']==j['first_edits_using_dedicated_certificate']
+    assert c['distance2_pairs_total']==j['distance2_pairs_total']
+    assert c['pairs_certified_by_preserved_certificate']==j['distance2_pairs_certified_by_preserved_certificate']
+    assert c['pairs_requiring_fresh_global_parity_check']==j['distance2_pairs_requiring_fresh_global_parity_check']
+    assert c['certificate_failures']==0
+    assert c['consistent_pair_count']==0
+print('CROSS-IMPLEMENTATION DISTANCE-2 COUNTS MATCH')
+PY
 
 printf '%s\n' 'ALL R006 EXACT REPLAYS PASSED'
