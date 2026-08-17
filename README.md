@@ -60,8 +60,10 @@ AlphaTensor published a 47-multiplication algorithm for $4\times4$ matrix multip
 
 ## Paper
 
-- [Manuscript source](manuscript/r006_local_obstructions.tex)
-- [Manuscript PDF](manuscript/r006_local_obstructions.pdf)
+- [Canonical manuscript source](manuscript/r006_local_obstructions.tex)
+- [Reproducible PDF build instructions](manuscript/README.md)
+
+The GitHub Actions `manuscript` job rebuilds the paper from source on every push and pull request and uploads the resulting PDF as the `r006-manuscript` workflow artifact. The source remains canonical so an opaque binary cannot silently drift from the reviewed text.
 
 The manuscript derives the mod-4 linearization and the `F3` sign-parity obstruction, proves certificate soundness, explains the complete support-distance-two coverage argument, and states the limitations explicitly.
 
@@ -99,7 +101,7 @@ The two canonical mathematical inputs are the frozen normalized factor objects i
 
 ## Repository map
 
-- `manuscript/` — paper source and reproducible PDF build.
+- `manuscript/` — canonical paper source and deterministic PDF build; CI publishes the generated PDF as an artifact.
 - `claim.json` — machine-readable canonical claim/non-claim record.
 - `STATEMENT_AUDIT.md` — public claim → mathematical argument → executable evidence.
 - `VERIFICATION.md` — reproduction commands and trust boundary.
@@ -111,12 +113,13 @@ The two canonical mathematical inputs are the frozen normalized factor objects i
 - `SHA256SUMS` — immutable artifact manifest.
 - `RESULTS.json` — machine-readable verified counts.
 - `REPLAY_OUTPUT.txt` — deterministic summary of the canonical successful replay.
-- `.github/workflows/verify.yml` — clean-checkout CI.
+- `.github/workflows/verify.yml` — clean-checkout exact proof replay and manuscript build.
 
 ## Status
 
 - Exact proof-carrying computational release
 - Complete support-distance-two sweep: verified
+- Reproducible manuscript build: verified in CI
 - Independent specialist review: **pending**
 - Global rank-47 problem outside characteristic two: **open**
 
