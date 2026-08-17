@@ -63,7 +63,7 @@ printf '%s\n' '== complete F3 support distance = 2 sweep (independent C++20) =='
 command -v g++ >/dev/null || { echo 'g++ is required for the independent C++ replay' >&2; exit 2; }
 python3 f3/export_distance2_inputs.py "$tmp/f3/data/r47_alphatensor_f2_factors.json" "$tmp/f3/certificates/alpha_distance1_f3_obstruction.json" "$tmp/alpha_cxx.txt"
 python3 f3/export_distance2_inputs.py "$tmp/f3/data/r47_flips_data.json" "$tmp/f3/certificates/flips_distance1_f3_obstruction.json" "$tmp/flips_cxx.txt"
-g++ -O3 -std=c++20 -fopenmp -Wall -Wextra -Werror f3/independent_distance2_check.cpp -o "$tmp/independent_distance2_check"
+g++ -O3 -std=c++20 -fopenmp -Wall -Wextra -Werror -Wno-comment f3/independent_distance2_check.cpp -o "$tmp/independent_distance2_check"
 OMP_NUM_THREADS=2 "$tmp/independent_distance2_check" "$tmp/alpha_cxx.txt" > "$tmp/alpha_cxx.out" & c1=$!
 OMP_NUM_THREADS=2 "$tmp/independent_distance2_check" "$tmp/flips_cxx.txt" > "$tmp/flips_cxx.out" & c2=$!
 wait "$c1"; wait "$c2"
