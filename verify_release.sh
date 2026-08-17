@@ -38,7 +38,7 @@ python3 f3/check_f3_support_obstruction.py "$tmp/f3/data/r47_flips_data.json" "$
 python3 f3/check_f3_support_obstruction_independent.py "$tmp/f3/data/r47_alphatensor_f2_factors.json" "$tmp/f3/certificates/alpha_support_f3_no_signlift_ungauged.json" "$tmp/f3/certificates/alpha_distance1_f3_obstruction.json"
 python3 f3/check_f3_support_obstruction_independent.py "$tmp/f3/data/r47_flips_data.json" "$tmp/f3/certificates/flips_support_f3_no_signlift_ungauged.json" "$tmp/f3/certificates/flips_distance1_f3_obstruction.json"
 
-printf '%s\n' '== complete F3 support distance = 2 sweep =='
+printf '%s\n' '== complete F3 support distance = 2 sweep (Python) =='
 python3 f3/verify_distance2_parallel.py "$tmp/f3/data/r47_alphatensor_f2_factors.json" "$tmp/f3/certificates/alpha_distance1_f3_obstruction.json" "$tmp/alpha_d2.json" --workers 4 & p1=$!
 python3 f3/verify_distance2_parallel.py "$tmp/f3/data/r47_flips_data.json" "$tmp/f3/certificates/flips_distance1_f3_obstruction.json" "$tmp/flips_d2.json" --workers 4 & p2=$!
 wait "$p1"; wait "$p2"
@@ -58,4 +58,18 @@ for path,dedicated in zip(sys.argv[1:],expected_dedicated):
    'preserved=',x['distance2_pairs_certified_by_preserved_certificate']
  )
 PY
+
+printf '%s\n' '== complete F3 support distance = 2 sweep (independent C++20) =='
+command -v g++ >/dev/null || { echo 'g++ is required for the independent C++ replay' >&2; exit 2; }
+python3 f3/export_distance2_inputs.py "$tmp/f3/data/r47_alphatensor_f2_factors.json" "$tmp/f3/certificates/alpha_distance1_f3_obstruction.json" "$tmp/alpha_cxx.txt"
+python3 f3/export_distance2_inputs.py "$tmp/f3/data/r47_flips_data.json" "$tmp/f3/certificates/flips_distance1_f3_obstruction.json" "$tmp/flips_cxx.txt"
+g++ -O3 -std=c++20 -fopenmp -Wall -Wextra -Werror f3/independent_distance2_check.cpp -o "$tmp/independent_distance2_check"
+OMP_NUM_THREADS=2 "$tmp/independent_distance2_check" "$tmp/alpha_cxx.txt" > "$tmp/alpha_cxx.out" & c1=$!
+OMP_NUM_THREADS=2 "$tmp/independent_distance2_check" "$tmp/flips_cxx.txt" > "$tmp/flips_cxx.out" & c2=$!
+wait "$c1"; wait "$c2"
+cat "$tmp/alpha_cxx.out"
+cat "$tmp/flips_cxx.out"
+grep -qx 'INDEPENDENT CXX R006 F3 DISTANCE-2 CHECK PASSED' <(tail -n 1 "$tmp/alpha_cxx.out")
+grep -qx 'INDEPENDENT CXX R006 F3 DISTANCE-2 CHECK PASSED' <(tail -n 1 "$tmp/flips_cxx.out")
+
 printf '%s\n' 'ALL R006 EXACT REPLAYS PASSED'
