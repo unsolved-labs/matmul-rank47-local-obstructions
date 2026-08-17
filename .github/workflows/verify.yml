@@ -3,13 +3,17 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Syntax-check verification sources
@@ -18,3 +22,23 @@ jobs:
           python3 -m py_compile mod4/*.py f3/*.py
       - name: Replay exact certificates and complete distance-two sweep
         run: ./verify_release.sh
+
+  manuscript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-fonts-recommended
+      - name: Build manuscript twice
+        run: make -C manuscript
+      - name: Check manuscript output
+        run: test -s manuscript/r006_local_obstructions.pdf
+      - name: Upload manuscript PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: r006-manuscript
+          path: manuscript/r006_local_obstructions.pdf
+          if-no-files-found: error
