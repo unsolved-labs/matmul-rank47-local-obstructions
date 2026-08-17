@@ -16,20 +16,28 @@ VALID Kauers-Moosbauer base support and all 2256 single-entry support edits; 113
 VALID independent base/distance-one replay for both seeds
 
 == complete F3 support distance = 2 sweep ==
+Two complete implementations: Python and independently structured C++20.
+Both account for every unordered support pair and agree on the exact partition.
+
 AlphaTensor:
   all_first_edits = 2256
+  dedicated_first_certificates = 70
   distance2_pairs_total = 2543640
   pairs_certified_by_preserved_certificate = 2451033
   pairs_requiring_fresh_global_parity_check = 92607
+  certificate_failures = 0
   consistent_pair_count = 0
 
 Kauers-Moosbauer:
   all_first_edits = 2256
+  dedicated_first_certificates = 113
   distance2_pairs_total = 2543640
   pairs_certified_by_preserved_certificate = 2418698
   pairs_requiring_fresh_global_parity_check = 124942
+  certificate_failures = 0
   consistent_pair_count = 0
 
+CROSS-IMPLEMENTATION DISTANCE-2 COUNTS MATCH
 ALL R006 EXACT REPLAYS PASSED
 
 This summary records deterministic outcomes only. The canonical verification is the executable ./verify_release.sh at the release commit; CI logs are the execution record. Timing and temporary paths are intentionally omitted.
