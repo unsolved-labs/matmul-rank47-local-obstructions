@@ -33,7 +33,7 @@ $$
 \binom{2256}{2}=2{,}543{,}640
 $$
 
-unordered distance-two supports per seed. The current verifier covers **every one**.
+unordered distance-two supports per seed. The release verifier covers **every one**.
 
 | Frozen seed | Distance-two supports | Preserved contradiction | Fresh global parity check | Survivors |
 |---|---:|---:|---:|---:|
@@ -41,6 +41,8 @@ unordered distance-two supports per seed. The current verifier covers **every on
 | Kauers–Moosbauer | 2,543,640 | 2,418,698 | 124,942 | 0 |
 
 The `F3` proof uses exact necessary sign-parity equations. An inconsistent parity subsystem rigorously excludes an `F3` coefficient assignment. A parity-consistent support, if one existed, would **not** by itself prove that a decomposition exists.
+
+The complete radius-two proof is implemented twice: the primary Python verifier uses dynamically renumbered active sign variables and integer bitmasks, while an independently structured C++20 verifier uses a fixed 2,256-variable sign space, 36-word rows, its own exact `GF(2)` elimination, and OpenMP. The canonical release command requires both paths to pass.
 
 ## What this does not prove
 
@@ -56,7 +58,7 @@ See [`CLAIM_BOUNDARY.md`](CLAIM_BOUNDARY.md) for the citation-safe scope.
 
 ## Why this is relevant
 
-AlphaTensor published a 47-multiplication algorithm for $4\times4$ matrix multiplication in arithmetic modulo two. Public 48-multiplication constructions are known outside characteristic two, including a rational construction. R006 does not close the one-multiplication gap; it identifies exact obstructions to two natural local routes starting from two known binary rank-47 schemes.
+AlphaTensor published a 47-multiplication algorithm for $4\times4$ matrix multiplication in arithmetic modulo two. Public 48-multiplication constructions are known outside characteristic two, including rational constructions. R006 does not close the one-multiplication gap; it identifies exact obstructions to two natural local routes starting from two known binary rank-47 schemes.
 
 ## Paper
 
@@ -65,11 +67,11 @@ AlphaTensor published a 47-multiplication algorithm for $4\times4$ matrix multip
 
 The GitHub Actions `manuscript` job rebuilds the paper from source on every push and pull request and uploads the resulting PDF as the `r006-manuscript` workflow artifact. The source remains canonical so an opaque binary cannot silently drift from the reviewed text.
 
-The manuscript derives the mod-4 linearization and the `F3` sign-parity obstruction, proves certificate soundness, explains the complete support-distance-two coverage argument, and states the limitations explicitly.
+The manuscript derives both obstruction lemmas, proves certificate soundness, gives the complete support-radius-two accounting, explains the independent verification paths, and states the limitations explicitly.
 
 ## Exact verification
 
-From a clean checkout on Linux with Python 3.12+:
+From a clean Linux checkout with Python 3.12+ and a C++20 compiler with OpenMP support:
 
 ```bash
 ./verify_release.sh
@@ -87,13 +89,13 @@ The command:
 2. checks both rank-47 binary seeds against all 4,096 tensor equations;
 3. replays and regenerates both `Z/4Z` no-lift certificates;
 4. replays the `F3` base and distance-one certificates through two implementations;
-5. performs the complete all-first-edit distance-two sweep over all 2,543,640 unordered pairs per seed.
+5. performs the complete 2,543,640-pair radius-two sweep independently in Python and C++20 for each seed and requires exact pair accounting with zero survivors.
 
 See [`VERIFICATION.md`](VERIFICATION.md) for the exact trust boundary and [`STATEMENT_AUDIT.md`](STATEMENT_AUDIT.md) for the claim-to-proof/checker map.
 
 ## Formal verification boundary
 
-R006 currently uses exact finite certificates and exhaustive replay rather than Lean as its primary verification layer. The repository does not add untested proof-assistant code merely to claim formalization. [`FORMALIZATION_SCOPE.md`](FORMALIZATION_SCOPE.md) identifies the small algebraic and certificate-soundness lemmas that are appropriate future Lean targets and the standard such a formalization would need to meet.
+R006 currently uses exact finite certificates, exhaustive replay, and independent complete implementations rather than Lean as its primary verification layer. The repository does not add untested proof-assistant code merely to claim formalization. [`FORMALIZATION_SCOPE.md`](FORMALIZATION_SCOPE.md) identifies the small algebraic and certificate-soundness lemmas that are appropriate future Lean targets and the standard such a formalization would need to meet.
 
 ## Provenance
 
@@ -108,7 +110,7 @@ The two canonical mathematical inputs are the frozen normalized factor objects i
 - `FORMALIZATION_SCOPE.md` — proof-assistant scope and acceptance standard.
 - `PROVENANCE.md` — frozen-input identity and public source context.
 - `mod4/` — exact coefficient-wise no-lift generator and independent certificate replay.
-- `f3/` — exact sign-parity certificate replay and complete radius-two verifier.
+- `f3/` — exact sign-parity certificate replay plus independent Python and C++20 complete radius-two verifiers.
 - `artifact/` — losslessly compressed frozen factor/certificate payloads.
 - `SHA256SUMS` — immutable artifact manifest.
 - `RESULTS.json` — machine-readable verified counts.
@@ -118,7 +120,7 @@ The two canonical mathematical inputs are the frozen normalized factor objects i
 ## Status
 
 - Exact proof-carrying computational release
-- Complete support-distance-two sweep: verified
+- Complete support-distance-two theorem: verified by exhaustive exact replay
 - Reproducible manuscript build: verified in CI
 - Independent specialist review: **pending**
 - Global rank-47 problem outside characteristic two: **open**
