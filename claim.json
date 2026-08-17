@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "release": "R006",
+  "title": "Exact local obstructions around rank-47 4x4 matrix-multiplication schemes",
+  "parent_problem_solved": false,
+  "canonical_inputs": {
+    "description": "Two frozen normalized rank-47 decompositions of the 4x4 matrix-multiplication tensor over F2",
+    "alpha_factor_sha256": "48cc645eaa0b37cf39fe1f079354e06bb6448f2c837ac965993ec43d292b9ed7",
+    "kauers_moosbauer_factor_sha256": "0777ee0faed803d874f1b4fa3ccf376899a2bd4b912e4a8079a7bd4ee16eba87"
+  },
+  "claims": [
+    {
+      "id": "R006-MOD4-LOCAL",
+      "statement": "Neither frozen binary rank-47 scheme admits a coefficient-wise lift to Z/4Z that reduces to the same scheme modulo 2 and satisfies all 4096 matrix-multiplication tensor equations.",
+      "verification": "Exact F2 linearization with frozen XOR contradiction certificates, independently replayed by two implementations and deterministically regenerated."
+    },
+    {
+      "id": "R006-F3-SUPPORT-R2",
+      "statement": "For either frozen seed, neither the frozen factor-entry support nor any support obtained by one or two distinct factor-entry toggles admits an assignment of nonzero F3 coefficients satisfying the matrix-multiplication tensor equations.",
+      "verification": "Exact necessary sign-parity certificates for the base and every single toggle, plus complete independent Python and C++20 sweeps of all 2,543,640 unordered distance-two supports per seed; every pair is certified by a preserved contradiction or fresh exact global parity elimination, with zero survivors required in both implementations."
+    }
+  ],
+  "non_claims": [
+    "No global tensor-rank lower bound of 48 over F3, Q, R, or C.",
+    "No exclusion of rank-47 F3 schemes at factor-entry support distance at least three from the frozen seeds.",
+    "No exclusion of other rank-47 F2 seeds with different lifting behavior.",
+    "No claim that consistency of the necessary F3 parity system would imply existence of an F3 decomposition.",
+    "No claim of independent specialist or peer review; review status remains pending."
+  ],
+  "machine_verification": {
+    "entry_point": "./verify_release.sh",
+    "python": "3.12+",
+    "cxx": "C++20 with OpenMP",
+    "complete_distance2_implementations": [
+      "f3/verify_distance2_parallel.py",
+      "f3/independent_distance2_check.cpp"
+    ],
+    "artifact_manifest": "SHA256SUMS",
+    "statement_audit": "STATEMENT_AUDIT.md",
+    "trust_boundary": "VERIFICATION.md",
+    "manuscript_source": "manuscript/r006_local_obstructions.tex",
+    "formalization_scope": "FORMALIZATION_SCOPE.md"
+  },
+  "review_status": "pending",
+  "ai_origin": "Frontier-AI-generated Unsolved Labs research release; correctness claims rest on the public proof and exact artifacts, not on conventional human authorship."
+}

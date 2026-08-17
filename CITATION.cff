@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use R006, cite this repository/release and the upstream matrix-multiplication sources listed in the manuscript."
+title: "Exact local obstructions around rank-47 4x4 matrix-multiplication schemes"
+type: software
+authors:
+  - name: "Unsolved Labs"
+version: "R006"
+date-released: 2026-08-14
+url: "https://github.com/unsolved-labs/matmul-rank47-local-obstructions"
+repository-code: "https://github.com/unsolved-labs/matmul-rank47-local-obstructions"
+abstract: >-
+  Exact proof-carrying computational certificates excluding coefficient-wise
+  Z/4Z lifts and F3 coefficient assignments within factor-entry support
+  distance two of two frozen rank-47 decompositions of the 4x4
+  matrix-multiplication tensor over F2. These are local representation-specific
+  obstructions and do not prove a global rank-48 lower bound.
+keywords:
+  - matrix multiplication
+  - tensor rank
+  - computer-assisted proof
+  - finite fields
+  - exact verification

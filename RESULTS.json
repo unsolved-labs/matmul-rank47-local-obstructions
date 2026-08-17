@@ -1,1 +1,58 @@
-{"release":"R006","title":"Rank-47 matrix-multiplication local obstructions","parent_problem_solved":false,"frozen_seeds":["AlphaTensor rank-47 over F2","Kauers-Moosbauer rank-47 over F2"],"exact_results":{"mod4_no_lift":{"alpha_certificate_equations":523,"kauers_moosbauer_certificate_equations":292,"lift_variables_per_seed":2256,"tensor_equations":4096,"coefficient_wise_lift_exists":false},"f3_support_distance_2":{"single_support_toggles_per_seed":2256,"alpha_single_edits_requiring_fresh_certificate":70,"kauers_moosbauer_single_edits_requiring_fresh_certificate":113,"alpha_affected_ordered_second_edits":15075,"kauers_moosbauer_affected_ordered_second_edits":18157,"parity_consistent_supports_within_distance_2":0}},"review_status":"pending","claim_boundary":"Local representation-specific nonexistence results only; no rank >= 48 lower bound over F3 or characteristic zero."}
+{
+  "release": "R006",
+  "title": "Exact local obstructions around rank-47 4x4 matrix-multiplication schemes",
+  "parent_problem_solved": false,
+  "frozen_seeds": [
+    {
+      "name": "AlphaTensor rank-47 over F2",
+      "factor_sha256": "48cc645eaa0b37cf39fe1f079354e06bb6448f2c837ac965993ec43d292b9ed7"
+    },
+    {
+      "name": "Kauers-Moosbauer rank-47 over F2",
+      "factor_sha256": "0777ee0faed803d874f1b4fa3ccf376899a2bd4b912e4a8079a7bd4ee16eba87"
+    }
+  ],
+  "exact_results": {
+    "seed_verification": {
+      "rank_terms": 47,
+      "tensor_equations_per_seed": 4096,
+      "valid_over_F2": true
+    },
+    "mod4_no_lift": {
+      "alpha_certificate_equations": 523,
+      "kauers_moosbauer_certificate_equations": 292,
+      "lift_variables_per_seed": 2256,
+      "tensor_equations": 4096,
+      "coefficient_wise_lift_exists": false,
+      "certificate_regeneration_matches": true,
+      "independent_certificate_replays": 2
+    },
+    "f3_support_distance_1": {
+      "single_support_toggles_per_seed": 2256,
+      "alpha_single_edits_requiring_dedicated_certificate": 70,
+      "kauers_moosbauer_single_edits_requiring_dedicated_certificate": 113,
+      "parity_consistent_supports": 0
+    },
+    "f3_support_distance_2": {
+      "complete_pair_sweep": true,
+      "unordered_support_pairs_per_seed": 2543640,
+      "complete_implementations": 2,
+      "implementation_languages": ["Python", "C++20"],
+      "cross_implementation_partition_counts_match": true,
+      "alpha_pairs_certified_by_preserved_certificate": 2451033,
+      "alpha_pairs_requiring_fresh_global_parity_check": 92607,
+      "kauers_moosbauer_pairs_certified_by_preserved_certificate": 2418698,
+      "kauers_moosbauer_pairs_requiring_fresh_global_parity_check": 124942,
+      "certificate_failures": 0,
+      "parity_consistent_supports": 0
+    }
+  },
+  "verification": {
+    "entry_point": "./verify_release.sh",
+    "successful_independent_complete_sweeps_observed_in_ci": true,
+    "expected_cross_implementation_line": "CROSS-IMPLEMENTATION DISTANCE-2 COUNTS MATCH",
+    "expected_final_line": "ALL R006 EXACT REPLAYS PASSED"
+  },
+  "review_status": "pending",
+  "claim_boundary": "Local representation-specific nonexistence results only; no rank >= 48 lower bound over F3 or characteristic zero."
+}

@@ -1,25 +1,43 @@
+R006 canonical exact replay summary
+
+== immutable artifact payload hashes ==
+10/10 frozen compressed payloads: OK
+
 == mod-4 no-lift certificates ==
-VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
-VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
-VALID alpha_mod4_result_generic.json: XOR of 523 equations gives 0 = 1
-VALID no-lift certificate: XOR of 523 equations gives 0 = 1 over F2 (2256 lift variables)
-VALID flips_mod4_result.json: XOR of 292 equations gives 0 = 1
-VALID no-lift certificate: XOR of 292 equations gives 0 = 1 over F2 (2256 lift variables)
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold (AlphaTensor)
+VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold (Kauers-Moosbauer)
+VALID AlphaTensor no-lift certificate: XOR of 523 equations gives 0 = 1 over F2 (2256 lift variables)
+VALID Kauers-Moosbauer no-lift certificate: XOR of 292 equations gives 0 = 1 over F2 (2256 lift variables)
 MOD4 REGENERATION MATCH
-== F3 support obstructions ==
-VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
-VALID F2 rank-47 4x4 scheme: all 4096 tensor equations hold
-VALID: base support and all 2256 single-entry support edits are obstructed over F3; 70 edits required dedicated certificates, the others preserve the base contradiction.
-VALID: base support and all 2256 single-entry support edits are obstructed over F3; 113 edits required dedicated certificates, the others preserve the base contradiction.
-VALID independent replay r47_alphatensor_f2_factors.json
-VALID independent replay r47_flips_data.json
-{
-  "source": "f3/data/r47_alphatensor_f2_factors.json",
-  "source_sha256": "48cc645eaa0b37cf39fe1f079354e06bb6448f2c837ac965993ec43d292b9ed7",
-  "distance1": "f3/certificates/alpha_distance1_f3_obstruction.json",
-  "first_edits": 70,
-  "ordered_second_edits_requiring_fresh_check": 15075,
-  "elapsed_seconds": 18.345645904541016,
-  "claim": "all support patterns at factor-entry Hamming distance at most 2 have a necessary F3 parity contradiction"
-}
-consistent_pair_count 0
+
+== F3 support distance <= 1 certificates ==
+VALID AlphaTensor base support and all 2256 single-entry support edits; 70 edits use dedicated certificates
+VALID Kauers-Moosbauer base support and all 2256 single-entry support edits; 113 edits use dedicated certificates
+VALID independent base/distance-one replay for both seeds
+
+== complete F3 support distance = 2 sweep ==
+Two complete implementations: Python and independently structured C++20.
+Both account for every unordered support pair and agree on the exact partition.
+
+AlphaTensor:
+  all_first_edits = 2256
+  dedicated_first_certificates = 70
+  distance2_pairs_total = 2543640
+  pairs_certified_by_preserved_certificate = 2451033
+  pairs_requiring_fresh_global_parity_check = 92607
+  certificate_failures = 0
+  consistent_pair_count = 0
+
+Kauers-Moosbauer:
+  all_first_edits = 2256
+  dedicated_first_certificates = 113
+  distance2_pairs_total = 2543640
+  pairs_certified_by_preserved_certificate = 2418698
+  pairs_requiring_fresh_global_parity_check = 124942
+  certificate_failures = 0
+  consistent_pair_count = 0
+
+CROSS-IMPLEMENTATION DISTANCE-2 COUNTS MATCH
+ALL R006 EXACT REPLAYS PASSED
+
+This summary records deterministic outcomes only. The canonical verification is the executable ./verify_release.sh at the release commit; CI logs are the execution record. Timing and temporary paths are intentionally omitted.
