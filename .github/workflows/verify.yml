@@ -6,11 +6,15 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Replay exact certificates
+      - name: Syntax-check verification sources
+        run: |
+          bash -n verify_release.sh
+          python3 -m py_compile mod4/*.py f3/*.py
+      - name: Replay exact certificates and complete distance-two sweep
         run: ./verify_release.sh
