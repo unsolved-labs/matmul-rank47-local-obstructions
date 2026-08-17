@@ -10,7 +10,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -20,7 +20,8 @@ jobs:
         run: |
           bash -n verify_release.sh
           python3 -m py_compile mod4/*.py f3/*.py
-      - name: Replay exact certificates and complete distance-two sweep
+          g++ -std=c++20 -fopenmp -Wall -Wextra -Werror -fsyntax-only f3/independent_distance2_check.cpp
+      - name: Replay exact certificates and independent complete distance-two sweeps
         run: ./verify_release.sh
 
   manuscript:
