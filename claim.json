@@ -17,7 +17,7 @@
     {
       "id": "R006-F3-SUPPORT-R2",
       "statement": "For either frozen seed, neither the frozen factor-entry support nor any support obtained by one or two distinct factor-entry toggles admits an assignment of nonzero F3 coefficients satisfying the matrix-multiplication tensor equations.",
-      "verification": "Exact necessary sign-parity certificates for the base and every single toggle, plus a complete sweep of all 2,543,640 unordered distance-two supports per seed; each pair is certified by a preserved contradiction or a fresh exact global parity contradiction."
+      "verification": "Exact necessary sign-parity certificates for the base and every single toggle, plus complete independent Python and C++20 sweeps of all 2,543,640 unordered distance-two supports per seed; every pair is certified by a preserved contradiction or fresh exact global parity elimination, with zero survivors required in both implementations."
     }
   ],
   "non_claims": [
@@ -30,6 +30,11 @@
   "machine_verification": {
     "entry_point": "./verify_release.sh",
     "python": "3.12+",
+    "cxx": "C++20 with OpenMP",
+    "complete_distance2_implementations": [
+      "f3/verify_distance2_parallel.py",
+      "f3/independent_distance2_check.cpp"
+    ],
     "artifact_manifest": "SHA256SUMS",
     "statement_audit": "STATEMENT_AUDIT.md",
     "trust_boundary": "VERIFICATION.md",
