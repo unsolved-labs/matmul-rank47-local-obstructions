@@ -36,16 +36,21 @@
     "f3_support_distance_2": {
       "complete_pair_sweep": true,
       "unordered_support_pairs_per_seed": 2543640,
+      "complete_implementations": 2,
+      "implementation_languages": ["Python", "C++20"],
+      "cross_implementation_partition_counts_match": true,
       "alpha_pairs_certified_by_preserved_certificate": 2451033,
       "alpha_pairs_requiring_fresh_global_parity_check": 92607,
       "kauers_moosbauer_pairs_certified_by_preserved_certificate": 2418698,
       "kauers_moosbauer_pairs_requiring_fresh_global_parity_check": 124942,
+      "certificate_failures": 0,
       "parity_consistent_supports": 0
     }
   },
   "verification": {
     "entry_point": "./verify_release.sh",
-    "successful_complete_sweep_observed_in_ci": true,
+    "successful_independent_complete_sweeps_observed_in_ci": true,
+    "expected_cross_implementation_line": "CROSS-IMPLEMENTATION DISTANCE-2 COUNTS MATCH",
     "expected_final_line": "ALL R006 EXACT REPLAYS PASSED"
   },
   "review_status": "pending",
