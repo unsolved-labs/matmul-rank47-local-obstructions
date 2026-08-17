@@ -1,36 +1,73 @@
-# R006 — Rank-47 matrix-multiplication local obstructions
+# R006 — Exact local obstructions around rank-47 4×4 matrix multiplication
 
 **Unsolved Labs Research Release R006**
 
-Exact computer-assisted nonexistence certificates around the two public rank-47 decompositions of 4×4 matrix multiplication over `F2`.
+R006 is a proof-carrying computational study of two frozen public rank-47 decompositions of the $4\times4$ matrix-multiplication tensor over `F2`. It proves two **local nonexistence results** around those particular binary schemes.
+
+The global rank-47 question outside characteristic two remains open.
 
 ## Result
 
-The global characteristic-zero rank-47 problem remains open. This release establishes two narrower exact statements.
+### 1. No coefficient-wise `Z/4Z` lift of either frozen scheme
 
-1. **No coefficient-wise mod-4 lift of either frozen binary rank-47 scheme.** For the AlphaTensor and Kauers–Moosbauer decompositions, the complete first-order lifting systems over `F2` are inconsistent. Explicit XOR contradiction certificates use 523 and 292 tensor equations, respectively.
+For the AlphaTensor and Kauers–Moosbauer rank-47 binary decompositions distributed here, the complete first-order lifting systems over `F2` are inconsistent.
 
-2. **No `F3` coefficient assignment on either frozen support, or after any one or two factor-entry support toggles.** Each support within factor-entry Hamming distance at most two violates a necessary sign-parity condition over `F3`. The audit covers all 2,256 single toggles per seed and every affected ordered second toggle: 15,075 for AlphaTensor and 18,157 for Kauers–Moosbauer, with zero parity-consistent cases.
+- 4,096 tensor equations per seed;
+- 2,256 coefficient-correction variables per lifting system;
+- AlphaTensor contradiction certificate: 523 tensor equations;
+- Kauers–Moosbauer contradiction certificate: 292 tensor equations.
 
-## Baseline
+Each frozen XOR certificate is replayed by two implementations, and the complete certificate is also regenerated deterministically from the frozen factors.
 
-The frozen inputs are two public rank-47 binary decompositions: AlphaTensor and Kauers–Moosbauer. Rank 47 is known in characteristic two; the audited characteristic-zero/rational frontier remains rank 48.
+### 2. No `F3` coefficient assignment within support distance two
 
-This release does **not** establish a lower bound of 48 over `F3`, `Q`, `R`, or `C`.
+Fix the zero/nonzero factor-entry support of either frozen rank-47 scheme. No assignment of nonzero `F3` coefficients satisfies the matrix-multiplication tensor equations on:
 
-## Exact trust boundary
+- the frozen support;
+- any of the 2,256 supports obtained by one factor-entry toggle; or
+- any support obtained by two distinct factor-entry toggles.
 
-- Both binary seeds are checked against all 4,096 matrix-multiplication tensor equations.
-- Mod-4 lifting reduces exactly to linear systems over `F2` with 2,256 correction variables.
-- Each no-lift contradiction is replayed by two independent implementations.
-- The `F3` support exclusions use exact parity constraints only.
-- All 2,256 single support edits per seed are checked.
-- The distance-two verifier exhausts every second edit capable of invalidating the current contradiction.
-- No floating-point acceptance threshold enters any released claim.
+There are
 
-## Reproduce
+$$
+\binom{2256}{2}=2{,}543{,}640
+$$
 
-Linux with Python 3.12+ is sufficient:
+unordered distance-two supports per seed. The current verifier covers **every one**.
+
+| Frozen seed | Distance-two supports | Preserved contradiction | Fresh global parity check | Survivors |
+|---|---:|---:|---:|---:|
+| AlphaTensor | 2,543,640 | 2,451,033 | 92,607 | 0 |
+| Kauers–Moosbauer | 2,543,640 | 2,418,698 | 124,942 | 0 |
+
+The `F3` proof uses exact necessary sign-parity equations. An inconsistent parity subsystem rigorously excludes an `F3` coefficient assignment. A parity-consistent support, if one existed, would **not** by itself prove that a decomposition exists.
+
+## What this does not prove
+
+R006 does **not** prove tensor rank at least 48 over `F3`, `Q`, `R`, or `C`.
+
+It does not exclude:
+
+- rank-47 `F3` supports at factor-entry distance at least three from both frozen seeds;
+- another binary rank-47 decomposition with different lifting behavior;
+- an odd-characteristic or characteristic-zero rank-47 decomposition unrelated to these local reductions.
+
+See [`CLAIM_BOUNDARY.md`](CLAIM_BOUNDARY.md) for the citation-safe scope.
+
+## Why this is relevant
+
+AlphaTensor published a 47-multiplication algorithm for $4\times4$ matrix multiplication in arithmetic modulo two. Public 48-multiplication constructions are known outside characteristic two, including a rational construction. R006 does not close the one-multiplication gap; it identifies exact obstructions to two natural local routes starting from two known binary rank-47 schemes.
+
+## Paper
+
+- [Manuscript source](manuscript/r006_local_obstructions.tex)
+- [Manuscript PDF](manuscript/r006_local_obstructions.pdf)
+
+The manuscript derives the mod-4 linearization and the `F3` sign-parity obstruction, proves certificate soundness, explains the complete support-distance-two coverage argument, and states the limitations explicitly.
+
+## Exact verification
+
+From a clean checkout on Linux with Python 3.12+:
 
 ```bash
 ./verify_release.sh
@@ -42,21 +79,50 @@ Expected final line:
 ALL R006 EXACT REPLAYS PASSED
 ```
 
-## Repository layout
+The command:
 
-- `mod4/` — exact no-lift generator and two independent checkers.
-- `f3/` — independent support-obstruction checkers and exhaustive distance-two verifier.
-- `artifact/` — losslessly compressed, base64-encoded frozen inputs and certificates; `verify_release.sh` restores the exact byte streams before replay.
-- `RESULTS.json` — machine-readable result summary.
-- `CLAIM_BOUNDARY.md` — precise limitations.
-- `PROVENANCE.md` — provenance of the frozen public rank-47 inputs.
-- `.github/workflows/verify.yml` — CI replay of the complete verifier.
+1. verifies SHA-256 hashes of all immutable factor/certificate payloads;
+2. checks both rank-47 binary seeds against all 4,096 tensor equations;
+3. replays and regenerates both `Z/4Z` no-lift certificates;
+4. replays the `F3` base and distance-one certificates through two implementations;
+5. performs the complete all-first-edit distance-two sweep over all 2,543,640 unordered pairs per seed.
+
+See [`VERIFICATION.md`](VERIFICATION.md) for the exact trust boundary and [`STATEMENT_AUDIT.md`](STATEMENT_AUDIT.md) for the claim-to-proof/checker map.
+
+## Formal verification boundary
+
+R006 currently uses exact finite certificates and exhaustive replay rather than Lean as its primary verification layer. The repository does not add untested proof-assistant code merely to claim formalization. [`FORMALIZATION_SCOPE.md`](FORMALIZATION_SCOPE.md) identifies the small algebraic and certificate-soundness lemmas that are appropriate future Lean targets and the standard such a formalization would need to meet.
+
+## Provenance
+
+The two canonical mathematical inputs are the frozen normalized factor objects in this repository, identified by SHA-256 and independently checked as valid `F2` rank-47 schemes. [`PROVENANCE.md`](PROVENANCE.md) records the public AlphaTensor and Kauers–Moosbauer source families and explains a historical limitation: the initial R006 release did not preserve the exact upstream file/commit used to produce each normalized JSON, so the release does not guess that identity retroactively.
+
+## Repository map
+
+- `manuscript/` — paper source and reproducible PDF build.
+- `claim.json` — machine-readable canonical claim/non-claim record.
+- `STATEMENT_AUDIT.md` — public claim → mathematical argument → executable evidence.
+- `VERIFICATION.md` — reproduction commands and trust boundary.
+- `FORMALIZATION_SCOPE.md` — proof-assistant scope and acceptance standard.
+- `PROVENANCE.md` — frozen-input identity and public source context.
+- `mod4/` — exact coefficient-wise no-lift generator and independent certificate replay.
+- `f3/` — exact sign-parity certificate replay and complete radius-two verifier.
+- `artifact/` — losslessly compressed frozen factor/certificate payloads.
+- `SHA256SUMS` — immutable artifact manifest.
+- `RESULTS.json` — machine-readable verified counts.
+- `REPLAY_OUTPUT.txt` — deterministic summary of the canonical successful replay.
+- `.github/workflows/verify.yml` — clean-checkout CI.
 
 ## Status
 
-- Proof-carrying computational release
-- Independent specialist review: pending
-- Global rank-47 problem: open
+- Exact proof-carrying computational release
+- Complete support-distance-two sweep: verified
+- Independent specialist review: **pending**
+- Global rank-47 problem outside characteristic two: **open**
+
+## AI-origin disclosure
+
+R006 is an Unsolved Labs research release generated with frontier AI. Correctness claims rest on the public mathematical argument and exact machine-checkable artifacts in this repository; no private conversation or hidden reasoning is part of the research record.
 
 ## Public release page
 
