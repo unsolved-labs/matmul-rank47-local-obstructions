@@ -32,7 +32,7 @@ jobs:
           build: false
           test: false
           lint: false
-          use-github-cache: false
+          use-github-cache: true
           use-mathlib-cache: true
       - name: Verify exact pins
         run: |
