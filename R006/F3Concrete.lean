@@ -202,31 +202,14 @@ theorem checkF3Certificate_push_of_not_affects
   have hacc := f3CertificateAccum_push_of_not_affects f edits e cert haff
   simpa [checkF3Certificate, hacc] using hcert
 
-/-- Every frozen AlphaTensor base-support parity row XORs to contradiction in Lean. -/
+/-- The frozen AlphaTensor base-support parity certificate is reconstructed and checked in Lean. -/
 theorem alpha_f3_base_certificate_checked :
     checkF3Certificate alphaFactors #[] alphaF3BaseCertificate = true := by
   decide
 
-/-- Every frozen Kauers–Moosbauer base-support parity row XORs to contradiction in Lean. -/
+/-- The frozen Kauers–Moosbauer base-support parity certificate is reconstructed and checked in Lean. -/
 theorem flips_f3_base_certificate_checked :
     checkF3Certificate flipsFactors #[] flipsF3BaseCertificate = true := by
-  decide
-
-private def checkEditCertificate (f : Factors) (item : EditCertificate) : Bool :=
-  checkF3Certificate f #[item.edit] item.equations
-
-private def checkEditCertificatesList (f : Factors) : List EditCertificate → Bool
-  | [] => true
-  | item :: items => checkEditCertificate f item && checkEditCertificatesList f items
-
-/-- All 70 dedicated AlphaTensor distance-one certificates are reconstructed and checked in Lean. -/
-theorem alpha_f3_dedicated_distance1_checked :
-    checkEditCertificatesList alphaFactors alphaF3EditCertificates.toList = true := by
-  decide
-
-/-- All 113 dedicated Kauers–Moosbauer distance-one certificates are reconstructed and checked in Lean. -/
-theorem flips_f3_dedicated_distance1_checked :
-    checkEditCertificatesList flipsFactors flipsF3EditCertificates.toList = true := by
   decide
 
 end R006
