@@ -215,14 +215,18 @@ theorem flips_f3_base_certificate_checked :
 private def checkEditCertificate (f : Factors) (item : EditCertificate) : Bool :=
   checkF3Certificate f #[item.edit] item.equations
 
+private def checkEditCertificatesList (f : Factors) : List EditCertificate → Bool
+  | [] => true
+  | item :: items => checkEditCertificate f item && checkEditCertificatesList f items
+
 /-- All 70 dedicated AlphaTensor distance-one certificates are reconstructed and checked in Lean. -/
 theorem alpha_f3_dedicated_distance1_checked :
-    alphaF3EditCertificates.all (checkEditCertificate alphaFactors) = true := by
+    checkEditCertificatesList alphaFactors alphaF3EditCertificates.toList = true := by
   decide
 
 /-- All 113 dedicated Kauers–Moosbauer distance-one certificates are reconstructed and checked in Lean. -/
 theorem flips_f3_dedicated_distance1_checked :
-    flipsF3EditCertificates.all (checkEditCertificate flipsFactors) = true := by
+    checkEditCertificatesList flipsFactors flipsF3EditCertificates.toList = true := by
   decide
 
 end R006
