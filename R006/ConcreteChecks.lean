@@ -64,8 +64,8 @@ def certRhsXor (f : Factors) (cert : Array Coord) : Bool :=
 /-- Executable check that all selected coordinates are valid, coefficients XOR to zero, and RHS XORs to one. -/
 def checkMod4Certificate (f : Factors) (cert : Array Coord) : Bool :=
   cert.toList.all coordValid &&
-    (List.range (3 * 47 * 16)).all (fun v => !(certCoeffXor f cert v)) &&
-    certRhsXor f cert
+    ((List.range (3 * 47 * 16)).all (fun v => !(certCoeffXor f cert v)) &&
+      certRhsXor f cert)
 
 /-- The frozen 523-equation AlphaTensor mod-4 certificate is recomputed in Lean. -/
 theorem alpha_mod4_certificate_checked :
