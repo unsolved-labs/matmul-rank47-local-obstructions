@@ -51,7 +51,7 @@ theorem informative_count_parity
     (n : ZMod 2) = boolF2 (parityRhs k t) := by
   have hmod : (k + n) % 3 = t % 3 := by
     have hval := congrArg (fun z : ZMod 3 => z.val) hsum
-    simpa [ZMod.val_natCast] using hval
+    simpa only [ZMod.val_natCast] using hval
   apply ZMod.val_injective 2
   rw [ZMod.val_natCast, boolF2_val]
   interval_cases k <;> interval_cases n <;> interval_cases t
