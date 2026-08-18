@@ -101,10 +101,10 @@ theorem currentCertificate_checked
     let cid := current.getD first certs.size
     cid < certs.size ∧
       checkF3Certificate f #[planEditAt first] (planCertAt certs cid) = true := by
-  have hp := Bool.and_eq_true.mp h
+  have hp := Bool.and_eq_true_iff.mp h
   have hall := List.all_eq_true.mp hp.2
   have hv := hall first (List.mem_range.mpr hf)
-  have hvp := Bool.and_eq_true.mp hv
+  have hvp := Bool.and_eq_true_iff.mp hv
   exact ⟨of_decide_eq_true hvp.1, hvp.2⟩
 
 /-- A successful group check yields the checked alternate certificate at one group index. -/
@@ -117,8 +117,8 @@ theorem groupCertificate_checked
       checkF3Certificate f #[planEditAt g.first] (planCertAt certs g.cert) = true := by
   have hall := List.all_eq_true.mp h
   have hv := hall gi (List.mem_range.mpr hgi)
-  have h1 := Bool.and_eq_true.mp hv
-  have h2 := Bool.and_eq_true.mp h1.2
+  have h1 := Bool.and_eq_true_iff.mp hv
+  have h2 := Bool.and_eq_true_iff.mp h1.2
   exact ⟨of_decide_eq_true h1.1, of_decide_eq_true h2.1, h2.2⟩
 
 /-- Every listed assignment satisfies its reflected validity condition. -/
@@ -129,7 +129,7 @@ theorem assignment_checked
     {first : Nat} (hf : first < 2256)
     {a : PlanAssignment} (ha : a ∈ (assignments.getD first #[]).toList) :
     assignmentValid f certs groups first a = true := by
-  have hp := Bool.and_eq_true.mp h
+  have hp := Bool.and_eq_true_iff.mp h
   have hsize : assignments.size = 2256 := by simpa using hp.1
   have hall := List.all_eq_true.mp hp.2
   have hfsize : first < assignments.size := by simpa [hsize] using hf
@@ -161,8 +161,8 @@ theorem coverage_row_eq
     {first : Nat} (hf : first < 2256) :
     affectedSeconds f certs current first =
       plannedSeconds (assignments.getD first #[]) := by
-  have h1 := Bool.and_eq_true.mp h
-  have h2 := Bool.and_eq_true.mp h1.2
+  have h1 := Bool.and_eq_true_iff.mp h
+  have h2 := Bool.and_eq_true_iff.mp h1.2
   have hall := List.all_eq_true.mp h2.2
   exact hall first (List.mem_range.mpr hf)
 
