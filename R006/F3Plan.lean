@@ -5,15 +5,16 @@ namespace R006
 
 open GeneratedData GeneratedF3Plan
 
-set_option maxRecDepth 1000000 in
-set_option maxHeartbeats 1000000000 in
+set_option maxRecDepth 1000000
+set_option maxHeartbeats 1000000000
+
+/-- Kernel-checked complete radius-two proof plan for the AlphaTensor-derived seed. -/
 theorem alpha_f3_radius2_plan_checked :
     checkRadiusTwoPlan alphaFactors alphaCertificates alphaCurrentCertificate
       alphaGroups alphaAssignments = true := by
   decide
 
-set_option maxRecDepth 1000000 in
-set_option maxHeartbeats 1000000000 in
+/-- Kernel-checked complete radius-two proof plan for the Kauers–Moosbauer-derived seed. -/
 theorem flips_f3_radius2_plan_checked :
     checkRadiusTwoPlan flipsFactors flipsCertificates flipsCurrentCertificate
       flipsGroups flipsAssignments = true := by
