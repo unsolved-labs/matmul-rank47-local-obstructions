@@ -47,6 +47,7 @@ theorem informative_count_parity
   have hmod : (k + n) % 3 = t % 3 := by
     have hval := congrArg (fun z : ZMod 3 => z.val) hsum
     simpa [ZMod.val_natCast] using hval
+  apply ZMod.val_injective 2
   interval_cases k <;> interval_cases n <;> interval_cases t <;>
     norm_num [parityInformative, parityRhs, negativeResidue, boolF2,
       ZMod.val_natCast] at hk hn ht hi hmod ⊢
