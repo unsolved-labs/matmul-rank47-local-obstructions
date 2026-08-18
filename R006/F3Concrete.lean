@@ -54,10 +54,6 @@ def ranksParityMask (x : Coord) : List Nat → Nat
 def f3ParityMask (f : Factors) (edits : Array Edit) (x : Coord) : Nat :=
   ranksParityMask x (activeRanks f edits x)
 
-/-- Tensor-coordinate bounds used by every released certificate. -/
-def coordValid (x : Coord) : Bool :=
-  decide (coordA x < 16) && decide (coordB x < 16) && decide (coordC x < 16)
-
 /-- Reconstruct one necessary parity equation, when both the coordinate and the negative-count reduction are valid. -/
 def f3ParityEquation (f : Factors) (edits : Array Edit) (x : Coord) : Option (Nat × Bool) :=
   if coordValid x then
