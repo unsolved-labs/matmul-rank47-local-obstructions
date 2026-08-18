@@ -11,7 +11,7 @@ theorem checkRadiusTwoPlan_parts
       checkGroups f certs groups = true ∧
       checkAssignments f certs groups assignments = true ∧
       checkCoverageShape f certs current assignments = true := by
-  simpa [checkRadiusTwoPlan, Bool.and_eq_true] using h
+  simpa [checkRadiusTwoPlan, Bool.and_eq_true_iff] using h
 
 /-- Every affected second toggle has a concrete assignment record in the proof plan. -/
 theorem affected_assignment_exists
