@@ -62,8 +62,8 @@ theorem checkMod4Certificate_no_linearized_solution
     (hcheck : checkMod4Certificate f cert = true) :
     ¬ ∃ corr : Nat → Bool,
         ∀ x ∈ cert.toList, mod4RowValue f x corr = boolF2 (mod4Rhs f x) := by
-  have hp := Bool.and_eq_true.mp hcheck
-  have hrest := Bool.and_eq_true.mp hp.2
+  have hp := Bool.and_eq_true_iff.mp hcheck
+  have hrest := Bool.and_eq_true_iff.mp hp.2
   have hcoeffAll := hrest.1
   have hrhs : certRhsXor f cert = true := hrest.2
   have hcoeff : ∀ v : Fin 2256,
