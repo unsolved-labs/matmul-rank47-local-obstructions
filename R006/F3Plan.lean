@@ -15,25 +15,25 @@ private def checkCurrentCertificates
   (current.size == 3 * 47 * 16) &&
     (List.range (3 * 47 * 16)).all (fun first =>
       let cid := current.getD first certs.size
-      (cid < certs.size) && checkF3Certificate f #[editAt first] (certAt certs cid))
+      decide (cid < certs.size) && checkF3Certificate f #[editAt first] (certAt certs cid))
 
 private def checkGroups
     (f : Factors) (certs : Array (Array Coord)) (groups : Array PlanGroup) : Bool :=
   groups.all (fun g =>
-    (g.first < 3 * 47 * 16) && (g.cert < certs.size) &&
+    decide (g.first < 3 * 47 * 16) && decide (g.cert < certs.size) &&
       checkF3Certificate f #[editAt g.first] (certAt certs g.cert))
 
 private def assignmentValid
     (f : Factors) (certs : Array (Array Coord)) (groups : Array PlanGroup)
     (first : Nat) (a : PlanAssignment) : Bool :=
-  (first < a.second) && (a.second < 3 * 47 * 16) &&
+  decide (first < a.second) && decide (a.second < 3 * 47 * 16) &&
     if a.direct then
-      (a.ref < certs.size) &&
+      decide (a.ref < certs.size) &&
         checkF3Certificate f #[editAt first, editAt a.second] (certAt certs a.ref)
     else
-      (a.ref < groups.size) &&
+      decide (a.ref < groups.size) &&
         let g := groups.getD a.ref { first := groups.size, cert := certs.size }
-        (g.first == first) && (g.cert < certs.size) &&
+        (g.first == first) && decide (g.cert < certs.size) &&
           !(affectsCertificate f #[editAt first] (editAt a.second) (certAt certs g.cert))
 
 private def checkAssignments
