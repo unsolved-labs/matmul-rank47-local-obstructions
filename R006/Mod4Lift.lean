@@ -58,7 +58,7 @@ theorem checkMod4Certificate_no_coefficientwise_lift
     {f : Factors} {cert : Array Coord}
     (hcheck : checkMod4Certificate f cert = true) :
     ¬ ∃ corr : Nat → Bool, CoefficientwiseMod4Lift f corr := by
-  have hp := Bool.and_eq_true.mp hcheck
+  have hp := Bool.and_eq_true_iff.mp hcheck
   have hvalid := hp.1
   have hno := checkMod4Certificate_no_linearized_solution hcheck
   rintro ⟨corr, hsol⟩
