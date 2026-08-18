@@ -3,6 +3,14 @@ on:
   push:
     branches: [main]
   pull_request:
+    paths-ignore:
+      - 'R006/**'
+      - 'R006.lean'
+      - 'formal/**'
+      - 'lean-toolchain'
+      - 'lakefile.toml'
+      - 'lake-manifest.json'
+      - '.github/workflows/lean.yml'
   workflow_dispatch:
 
 concurrency:
