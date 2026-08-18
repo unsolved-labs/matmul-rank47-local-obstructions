@@ -7,3 +7,7 @@ import R006
 #print axioms R006.unique_negative_count_forces_parity
 #print axioms R006.alpha_mod4_certificate_checked
 #print axioms R006.flips_mod4_certificate_checked
+#print axioms R006.alpha_f3_base_certificate_checked
+#print axioms R006.flips_f3_base_certificate_checked
+#print axioms R006.alpha_f3_dedicated_distance1_checked
+#print axioms R006.flips_f3_dedicated_distance1_checked
