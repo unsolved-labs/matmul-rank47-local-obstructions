@@ -5,11 +5,20 @@ namespace R006
 
 open GeneratedData
 
+/-- Binary activity bits of the 47 rank-one monomials at one coordinate. -/
+def baseActiveBits (f : Factors) (x : Coord) : List Bool :=
+  (List.range 47).map (fun r =>
+    factorBit f 0 r (coordA x) && factorBit f 1 r (coordB x) &&
+      factorBit f 2 r (coordC x))
+
 /-- Integer number of active binary rank-one monomials at one tensor coordinate. -/
 def baseActiveCount (f : Factors) (x : Coord) : Nat :=
-  (List.range 47).foldl (fun s r =>
-    if factorBit f 0 r (coordA x) && factorBit f 1 r (coordB x) &&
-        factorBit f 2 r (coordC x) then s + 1 else s) 0
+  (baseActiveBits f x).count true
+
+/-- There are at most 47 active binary monomials. -/
+theorem baseActiveCount_le_47 (f : Factors) (x : Coord) : baseActiveCount f x ≤ 47 := by
+  have h := List.count_le_length true (baseActiveBits f x)
+  simpa [baseActiveCount, baseActiveBits] using h
 
 /-- Coefficient of a lift-correction bit in one first-order mod-4 equation. -/
 def mod4Coeff (f : Factors) (x : Coord) (v : Nat) : Bool :=
