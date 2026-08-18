@@ -22,12 +22,17 @@ jobs:
         with:
           persist-credentials: false
       - name: Restore frozen formalization inputs
-        run: python3 formal/export_frozen_inputs.py
+        run: |
+          set -euo pipefail
+          python3 formal/export_frozen_inputs.py
+          python3 formal/generate_lean_data.py
       - name: Upload frozen-input inspection artifact
         uses: actions/upload-artifact@v4
         with:
           name: r006-formal-inputs
-          path: formal_inputs/
+          path: |
+            formal_inputs/
+            R006/GeneratedData.lean
           if-no-files-found: error
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
