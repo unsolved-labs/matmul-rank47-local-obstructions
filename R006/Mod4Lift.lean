@@ -33,7 +33,7 @@ theorem expanded_mod4_row_forces_rhs
       simpa [doubleF2] using h
     have hmod : s % 4 = t % 4 := by
       have hval := congrArg (fun z : ZMod 4 => z.val) hcast
-      simpa [ZMod.val_natCast] using hval
+      simpa only [ZMod.val_natCast] using hval
     interval_cases s <;> interval_cases t <;>
       norm_num [boolF2] at hmod ⊢
   · subst l
@@ -41,7 +41,7 @@ theorem expanded_mod4_row_forces_rhs
       simpa [doubleF2, Nat.cast_add] using h
     have hmod : (s + 2) % 4 = t % 4 := by
       have hval := congrArg (fun z : ZMod 4 => z.val) hcast
-      simpa [ZMod.val_natCast] using hval
+      simpa only [ZMod.val_natCast] using hval
     interval_cases s <;> interval_cases t <;>
       norm_num [boolF2] at hmod ⊢
 
