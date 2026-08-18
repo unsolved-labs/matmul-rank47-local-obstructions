@@ -58,23 +58,12 @@ def main() -> None:
     alpha = json.loads((IN / "alpha_f3_radius2_plan.json").read_text())
     flips = json.loads((IN / "flips_f3_radius2_plan.json").read_text())
     text = f'''-- AUTO-GENERATED from untrusted proof plans. Lean validates all contents.
-import R006.GeneratedData
+import R006.F3PlanCore
 
 namespace R006.GeneratedF3Plan
 
-open R006.GeneratedData
+open R006 R006.GeneratedData
 abbrev Coord := R006.GeneratedData.Coord
-
-structure PlanGroup where
-  first : Nat
-  cert : Nat
-  deriving Repr, DecidableEq
-
-structure PlanAssignment where
-  second : Nat
-  direct : Bool
-  ref : Nat
-  deriving Repr, DecidableEq
 
 private def c (a b c : Nat) : Coord := (a, b, c)
 
