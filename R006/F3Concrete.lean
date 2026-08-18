@@ -5,40 +5,46 @@ namespace R006
 
 open GeneratedData
 
-private def activeRank (f : Factors) (edits : Array Edit) (x : Coord) (r : Nat) : Bool :=
+/-- Whether rank-one term `r` is active at a tensor coordinate after support edits. -/
+def activeRank (f : Factors) (edits : Array Edit) (x : Coord) (r : Nat) : Bool :=
   factorBitAfter f edits 0 r (coordA x) &&
     factorBitAfter f edits 1 r (coordB x) &&
     factorBitAfter f edits 2 r (coordC x)
 
+/-- Active rank-one terms at one tensor coordinate. -/
+def activeRanks (f : Factors) (edits : Array Edit) (x : Coord) : List Nat :=
+  (List.range 47).filter (activeRank f edits x)
+
 /-- Number of active rank-one monomials at one tensor coordinate. -/
 def f3ActiveCount (f : Factors) (edits : Array Edit) (x : Coord) : Nat :=
-  (List.range 47).foldl (fun k r => if activeRank f edits x r then k + 1 else k) 0
+  (activeRanks f edits x).length
 
-private def negativeResidue (k t : Nat) : Nat :=
+def negativeResidue (k t : Nat) : Nat :=
   (t + 3 - (k % 3)) % 3
 
-private def parityInformative (k t : Nat) : Bool :=
+/-- The exact bounded-coordinate criterion used to emit an F3 parity equation. -/
+def parityInformative (k t : Nat) : Bool :=
   if k == 0 then t == 1
   else if k > 4 then false
   else
     let n := negativeResidue k t
     (n <= k) && (n + 3 > k)
 
-private def parityRhs (k t : Nat) : Bool :=
+/-- Forced parity of the number of negative active monomials. -/
+def parityRhs (k t : Nat) : Bool :=
   if k == 0 then t == 1
   else (negativeResidue k t) % 2 == 1
 
-private def variableIndex (q r i : Nat) : Nat :=
+/-- Fixed sign-variable index in the 3×47×16 space. -/
+def variableIndex (q r i : Nat) : Nat :=
   (q * 47 + r) * 16 + i
 
 /-- Fixed-space 2,256-bit coefficient mask for one necessary F3 parity equation. -/
 def f3ParityMask (f : Factors) (edits : Array Edit) (x : Coord) : Nat :=
-  (List.range 47).foldl (fun mask r =>
-    if activeRank f edits x r then
-      mask ^^^ (1 <<< variableIndex 0 r (coordA x)) ^^^
-        (1 <<< variableIndex 1 r (coordB x)) ^^^
-        (1 <<< variableIndex 2 r (coordC x))
-    else mask) 0
+  (activeRanks f edits x).foldl (fun mask r =>
+    mask ^^^ (1 <<< variableIndex 0 r (coordA x)) ^^^
+      (1 <<< variableIndex 1 r (coordB x)) ^^^
+      (1 <<< variableIndex 2 r (coordC x))) 0
 
 /-- Reconstruct one necessary parity equation, when the negative count is uniquely determined. -/
 def f3ParityEquation (f : Factors) (edits : Array Edit) (x : Coord) : Option (Nat × Bool) :=
@@ -46,12 +52,19 @@ def f3ParityEquation (f : Factors) (edits : Array Edit) (x : Coord) : Option (Na
   let t := if targetBit x then 1 else 0
   if parityInformative k t then some (f3ParityMask f edits x, parityRhs k t) else none
 
-private def f3CertificateAccum
+/-- Recursive accumulator for a parity contradiction certificate. -/
+def f3CertificateAccumList
+    (f : Factors) (edits : Array Edit) : List Coord → Option (Nat × Bool)
+  | [] => some (0, false)
+  | x :: xs =>
+      match f3ParityEquation f edits x, f3CertificateAccumList f edits xs with
+      | some (m, y), some (m', y') => some (m ^^^ m', Bool.xor y y')
+      | _, _ => none
+
+/-- Accumulated coefficient mask and RHS for a concrete parity certificate. -/
+def f3CertificateAccum
     (f : Factors) (edits : Array Edit) (cert : Array Coord) : Option (Nat × Bool) :=
-  cert.foldl (fun acc x =>
-    match acc, f3ParityEquation f edits x with
-    | some (m, y), some (m', y') => some (m ^^^ m', Bool.xor y y')
-    | _, _ => none) (some (0, false))
+  f3CertificateAccumList f edits cert.toList
 
 /-- Exact executable contradiction check for a list of F3 parity coordinates. -/
 def checkF3Certificate (f : Factors) (edits : Array Edit) (cert : Array Coord) : Bool :=
