@@ -11,3 +11,5 @@ import R006
 #print axioms R006.flips_f3_base_certificate_checked
 #print axioms R006.alpha_f3_dedicated_distance1_checked
 #print axioms R006.flips_f3_dedicated_distance1_checked
+#print axioms R006.alpha_f3_radius2_plan_checked
+#print axioms R006.flips_f3_radius2_plan_checked
