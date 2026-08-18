@@ -80,23 +80,121 @@ def f3CertificateAccum
 def checkF3Certificate (f : Factors) (edits : Array Edit) (cert : Array Coord) : Bool :=
   decide (f3CertificateAccum f edits cert = some (0, true))
 
+/-- Whether one toggle can change an active monomial at one certificate coordinate. -/
+def affectsCoordinate (f : Factors) (edits : Array Edit) (e : Edit) (x : Coord) : Bool :=
+  let q := editQ e
+  let r := editR e
+  let i := editI e
+  if q == 0 then
+    (coordA x == i) && factorBitAfter f edits 1 r (coordB x) &&
+      factorBitAfter f edits 2 r (coordC x)
+  else if q == 1 then
+    (coordB x == i) && factorBitAfter f edits 0 r (coordA x) &&
+      factorBitAfter f edits 2 r (coordC x)
+  else if q == 2 then
+    (coordC x == i) && factorBitAfter f edits 0 r (coordA x) &&
+      factorBitAfter f edits 1 r (coordB x)
+  else false
+
 /-- Whether toggling one factor entry can change a monomial used by a certificate. -/
 def affectsCertificate
     (f : Factors) (edits : Array Edit) (e : Edit) (cert : Array Coord) : Bool :=
-  cert.any (fun x =>
-    let q := editQ e
-    let r := editR e
-    let i := editI e
-    if q == 0 then
-      (coordA x == i) && factorBitAfter f edits 1 r (coordB x) &&
-        factorBitAfter f edits 2 r (coordC x)
-    else if q == 1 then
-      (coordB x == i) && factorBitAfter f edits 0 r (coordA x) &&
-        factorBitAfter f edits 2 r (coordC x)
-    else if q == 2 then
-      (coordC x == i) && factorBitAfter f edits 0 r (coordA x) &&
-        factorBitAfter f edits 1 r (coordB x)
-    else false)
+  cert.toList.any (affectsCoordinate f edits e)
+
+/-- If the affected rank differs, a toggle cannot change an active monomial. -/
+theorem activeRank_push_of_rank_ne
+    (f : Factors) (edits : Array Edit) (e : Edit) (x : Coord) (r : Nat)
+    (hr : editR e ≠ r) :
+    activeRank f (edits.push e) x r = activeRank f edits x r := by
+  simp [activeRank, factorBitAfter_push_of_rank_ne, hr]
+
+/-- If `affectsCoordinate` is false, appending the toggle preserves every rank-one activity bit at that coordinate. -/
+theorem activeRank_push_of_not_affectsCoordinate
+    (f : Factors) (edits : Array Edit) (e : Edit) (x : Coord) (r : Nat)
+    (h : affectsCoordinate f edits e x = false) :
+    activeRank f (edits.push e) x r = activeRank f edits x r := by
+  by_cases hr : editR e = r
+  · subst r
+    by_cases hq0 : editQ e = 0
+    · by_cases hi : coordA x = editI e
+      · cases hb : factorBitAfter f edits 1 (editR e) (coordB x) <;>
+        cases hc : factorBitAfter f edits 2 (editR e) (coordC x) <;>
+        simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+          hq0, hi, hb, hc] at h ⊢
+      · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+          hq0, hi] at h ⊢
+    · by_cases hq1 : editQ e = 1
+      · by_cases hi : coordB x = editI e
+        · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
+          cases hc : factorBitAfter f edits 2 (editR e) (coordC x) <;>
+          simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+            hq0, hq1, hi, ha, hc] at h ⊢
+        · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+            hq0, hq1, hi] at h ⊢
+      · by_cases hq2 : editQ e = 2
+        · by_cases hi : coordC x = editI e
+          · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
+            cases hb : factorBitAfter f edits 1 (editR e) (coordB x) <;>
+            simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+              hq0, hq1, hq2, hi, ha, hb] at h ⊢
+          · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+              hq0, hq1, hq2, hi] at h ⊢
+        · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+            hq0, hq1, hq2] at h ⊢
+  · exact activeRank_push_of_rank_ne f edits e x r hr
+
+/-- An unaffected toggle preserves the complete active-rank list at one coordinate. -/
+theorem activeRanks_push_of_not_affectsCoordinate
+    (f : Factors) (edits : Array Edit) (e : Edit) (x : Coord)
+    (h : affectsCoordinate f edits e x = false) :
+    activeRanks f (edits.push e) x = activeRanks f edits x := by
+  unfold activeRanks
+  congr 1
+  funext r
+  exact activeRank_push_of_not_affectsCoordinate f edits e x r h
+
+/-- Therefore it preserves the exact emitted parity row. -/
+theorem f3ParityEquation_push_of_not_affectsCoordinate
+    (f : Factors) (edits : Array Edit) (e : Edit) (x : Coord)
+    (h : affectsCoordinate f edits e x = false) :
+    f3ParityEquation f (edits.push e) x = f3ParityEquation f edits x := by
+  have har := activeRanks_push_of_not_affectsCoordinate f edits e x h
+  simp [f3ParityEquation, f3ActiveCount, f3ParityMask, har]
+
+/-- Accumulating a coordinate list is unchanged when every coordinate is unaffected. -/
+theorem f3CertificateAccumList_push_of_forall_not_affects
+    (f : Factors) (edits : Array Edit) (e : Edit) :
+    ∀ (xs : List Coord),
+      (∀ x ∈ xs, affectsCoordinate f edits e x = false) →
+      f3CertificateAccumList f (edits.push e) xs = f3CertificateAccumList f edits xs
+  | [], _ => rfl
+  | x :: xs, h => by
+      have hx : affectsCoordinate f edits e x = false := h x (by simp)
+      have hxs : ∀ y ∈ xs, affectsCoordinate f edits e y = false := by
+        intro y hy
+        exact h y (by simp [hy])
+      simp [f3CertificateAccumList,
+        f3ParityEquation_push_of_not_affectsCoordinate f edits e x hx,
+        f3CertificateAccumList_push_of_forall_not_affects f edits e xs hxs]
+
+/-- A certificate reported unaffected has the same exact accumulator after the toggle. -/
+theorem f3CertificateAccum_push_of_not_affects
+    (f : Factors) (edits : Array Edit) (e : Edit) (cert : Array Coord)
+    (h : affectsCertificate f edits e cert = false) :
+    f3CertificateAccum f (edits.push e) cert = f3CertificateAccum f edits cert := by
+  apply f3CertificateAccumList_push_of_forall_not_affects
+  intro x hx
+  have hall := List.any_eq_false.mp h
+  exact hall x hx
+
+/-- Hence a checked contradiction certificate remains checked after an unaffected support toggle. -/
+theorem checkF3Certificate_push_of_not_affects
+    (f : Factors) (edits : Array Edit) (e : Edit) (cert : Array Coord)
+    (hcert : checkF3Certificate f edits cert = true)
+    (haff : affectsCertificate f edits e cert = false) :
+    checkF3Certificate f (edits.push e) cert = true := by
+  have hacc := f3CertificateAccum_push_of_not_affects f edits e cert haff
+  simpa [checkF3Certificate, hacc] using hcert
 
 /-- Every frozen AlphaTensor base-support parity row XORs to contradiction in Lean. -/
 set_option maxRecDepth 100000 in
