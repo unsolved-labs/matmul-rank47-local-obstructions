@@ -41,13 +41,23 @@ jobs:
           lake env lean --version
           test "$(git -C .lake/packages/mathlib rev-parse HEAD)" = \
             "81a5d257c8e410db227a6665ed08f64fea08e997"
-      - name: Compile soundness core before proof-plan generation
+      - name: Compile F3 certificate soundness
         env:
           LEAN_NUM_THREADS: '2'
         run: |
           set -euo pipefail
           lake build R006.F3CertificateSoundness
+      - name: Compile mod4 no-lift soundness
+        env:
+          LEAN_NUM_THREADS: '2'
+        run: |
+          set -euo pipefail
           lake build R006.Mod4Lift
+      - name: Compile radius-two plan soundness
+        env:
+          LEAN_NUM_THREADS: '2'
+        run: |
+          set -euo pipefail
           lake build R006.F3PlanSoundness
       - name: Generate untrusted complete F3 proof plan
         run: |
