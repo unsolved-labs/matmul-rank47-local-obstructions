@@ -21,6 +21,14 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
+      - name: Restore frozen formalization inputs
+        run: python3 formal/export_frozen_inputs.py
+      - name: Upload frozen-input inspection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r006-formal-inputs
+          path: formal_inputs/
+          if-no-files-found: error
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
           auto-config: false
