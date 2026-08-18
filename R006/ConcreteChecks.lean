@@ -1,46 +1,21 @@
 import R006.Algebra
-import R006.GeneratedData
+import R006.Model
 
 namespace R006
 
 open GeneratedData
-
-abbrev Factors := Array (Array (Array Bool))
-abbrev Coord := GeneratedData.Coord
-
-private def factorBit (f : Factors) (q r i : Nat) : Bool :=
-  ((f.getD q #[]).getD r #[]).getD i false
-
-private def coordA (x : Coord) : Nat := x.1
-private def coordB (x : Coord) : Nat := x.2.1
-private def coordC (x : Coord) : Nat := x.2.2
-
-private def targetBit (x : Coord) : Bool :=
-  let a := coordA x
-  let b := coordB x
-  let c := coordC x
-  let i := a / 4
-  let j := a % 4
-  let j2 := b / 4
-  let k := b % 4
-  (j == j2) && (c == 4 * k + i)
 
 private def activeCount (f : Factors) (x : Coord) : Nat :=
   (List.range 47).foldl (fun s r =>
     if factorBit f 0 r (coordA x) && factorBit f 1 r (coordB x) &&
         factorBit f 2 r (coordC x) then s + 1 else s) 0
 
-private def decodeVar (v : Nat) : Nat × Nat × Nat :=
-  let q := v / (47 * 16)
-  let rem := v % (47 * 16)
-  (q, rem / 16, rem % 16)
-
 /-- Coefficient of a lift-correction bit in one first-order mod-4 equation. -/
 def mod4Coeff (f : Factors) (x : Coord) (v : Nat) : Bool :=
   let d := decodeVar v
-  let q := d.1
-  let r := d.2.1
-  let i := d.2.2
+  let q := editQ d
+  let r := editR d
+  let i := editI d
   if q == 0 then
     (i == coordA x) && factorBit f 1 r (coordB x) && factorBit f 2 r (coordC x)
   else if q == 1 then
