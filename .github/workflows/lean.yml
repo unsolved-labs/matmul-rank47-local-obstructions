@@ -21,22 +21,11 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Restore frozen formalization inputs and generate untrusted proof plan
+      - name: Restore frozen inputs and generate core Lean data
         run: |
           set -euo pipefail
           python3 formal/export_frozen_inputs.py
-          python3 formal/generate_f3_plan.py
           python3 formal/generate_lean_data.py
-          python3 formal/generate_f3_plan_lean.py
-      - name: Upload formalization input / plan artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: r006-formal-inputs
-          path: |
-            formal_inputs/
-            R006/GeneratedData.lean
-            R006/GeneratedF3Plan.lean
-          if-no-files-found: error
       - uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
         with:
           auto-config: false
@@ -52,7 +41,28 @@ jobs:
           lake env lean --version
           test "$(git -C .lake/packages/mathlib rev-parse HEAD)" = \
             "81a5d257c8e410db227a6665ed08f64fea08e997"
-      - name: Build current formalization
+      - name: Compile soundness core before proof-plan generation
+        env:
+          LEAN_NUM_THREADS: '2'
+        run: |
+          set -euo pipefail
+          lake env lean R006/F3Tensor.lean
+          lake env lean R006/ConcreteChecks.lean
+      - name: Generate untrusted complete F3 proof plan
+        run: |
+          set -euo pipefail
+          python3 formal/generate_f3_plan.py
+          python3 formal/generate_f3_plan_lean.py
+      - name: Upload formalization input / plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r006-formal-inputs
+          path: |
+            formal_inputs/
+            R006/GeneratedData.lean
+            R006/GeneratedF3Plan.lean
+          if-no-files-found: error
+      - name: Build full formalization and trust-zero axiom audit
         env:
           LEAN_NUM_THREADS: '2'
         run: |
@@ -65,7 +75,7 @@ jobs:
           python3 - <<'PY'
           import pathlib, re, sys
           sources = [pathlib.Path('R006.lean'), *sorted(pathlib.Path('R006').rglob('*.lean'))]
-          pattern = re.compile(r'\b(?:sorry|admit|native_decide)\b|debug\.skipKernelTC|Lean\.ofReduceBool|Lean\.trustCompiler|^\s*(?:axiom|unsafe|extern|partial)\b|^\s*@\[implemented_by')
+          pattern = re.compile(r'\b(?:sorry|admit|native_decide)\b|debug\.skipKernelTC|Lean\.ofReduceBool|Lean\.trustCompiler|^\s*(?:axiom|opaque|unsafe|extern|partial)\b|^\s*@\[implemented_by')
           hits=[]
           for path in sources:
               for n,line in enumerate(path.read_text(encoding='utf-8').splitlines(),1):
