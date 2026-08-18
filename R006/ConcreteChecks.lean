@@ -20,7 +20,8 @@ def baseActiveCount (f : Factors) (x : Coord) : Nat :=
 
 /-- There are at most 47 active binary monomials. -/
 theorem baseActiveCount_le_47 (f : Factors) (x : Coord) : baseActiveCount f x ≤ 47 := by
-  have h := List.count_le_length true (baseActiveBits f x)
+  have h : (baseActiveBits f x).count true ≤ (baseActiveBits f x).length :=
+    List.count_le_length
   simpa [baseActiveCount, baseActiveBits] using h
 
 /-- Coefficient of a lift-correction bit in one first-order mod-4 equation. -/
