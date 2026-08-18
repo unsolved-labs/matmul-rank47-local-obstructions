@@ -46,8 +46,8 @@ jobs:
           LEAN_NUM_THREADS: '2'
         run: |
           set -euo pipefail
-          lake env lean R006/F3Tensor.lean
-          lake env lean R006/ConcreteChecks.lean
+          lake env lean R006/F3CertificateSoundness.lean
+          lake env lean R006/Mod4Lift.lean
       - name: Generate untrusted complete F3 proof plan
         run: |
           set -euo pipefail
