@@ -5,7 +5,8 @@ namespace R006
 
 open GeneratedData
 
-private def activeCount (f : Factors) (x : Coord) : Nat :=
+/-- Integer number of active binary rank-one monomials at one tensor coordinate. -/
+def baseActiveCount (f : Factors) (x : Coord) : Nat :=
   (List.range 47).foldl (fun s r =>
     if factorBit f 0 r (coordA x) && factorBit f 1 r (coordB x) &&
         factorBit f 2 r (coordC x) then s + 1 else s) 0
@@ -26,19 +27,32 @@ def mod4Coeff (f : Factors) (x : Coord) (v : Nat) : Bool :=
 
 /-- Right-hand side of the first-order mod-4 lifting equation, represented in `F₂`. -/
 def mod4Rhs (f : Factors) (x : Coord) : Bool :=
-  let s := activeCount f x
+  let s := baseActiveCount f x
   let t := if targetBit x then 1 else 0
   (((s - t) / 2) % 2) == 1
 
-private def certCoeffXor (f : Factors) (cert : Array Coord) (v : Nat) : Bool :=
-  cert.foldl (fun acc x => Bool.xor acc (mod4Coeff f x v)) false
+/-- XOR of one lift-variable coefficient through a certificate coordinate list. -/
+def mod4CoeffXorList (f : Factors) (v : Nat) : List Coord → Bool
+  | [] => false
+  | x :: xs => mod4Coeff f x v ^^ mod4CoeffXorList f v xs
 
-private def certRhsXor (f : Factors) (cert : Array Coord) : Bool :=
-  cert.foldl (fun acc x => Bool.xor acc (mod4Rhs f x)) false
+/-- XOR of the selected mod-4 lifting right-hand sides. -/
+def mod4RhsXorList (f : Factors) : List Coord → Bool
+  | [] => false
+  | x :: xs => mod4Rhs f x ^^ mod4RhsXorList f xs
 
-/-- Executable check that selected equations XOR to coefficient vector zero and RHS one. -/
+/-- Coefficient XOR for a concrete frozen certificate. -/
+def certCoeffXor (f : Factors) (cert : Array Coord) (v : Nat) : Bool :=
+  mod4CoeffXorList f v cert.toList
+
+/-- RHS XOR for a concrete frozen certificate. -/
+def certRhsXor (f : Factors) (cert : Array Coord) : Bool :=
+  mod4RhsXorList f cert.toList
+
+/-- Executable check that all selected coordinates are valid, coefficients XOR to zero, and RHS XORs to one. -/
 def checkMod4Certificate (f : Factors) (cert : Array Coord) : Bool :=
-  (List.range (3 * 47 * 16)).all (fun v => !(certCoeffXor f cert v)) &&
+  cert.all coordValid &&
+    (List.range (3 * 47 * 16)).all (fun v => !(certCoeffXor f cert v)) &&
     certRhsXor f cert
 
 /-- The frozen 523-equation AlphaTensor mod-4 certificate is recomputed in Lean. -/
