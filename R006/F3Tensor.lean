@@ -8,7 +8,9 @@ theorem boolF2_xorList (xs : List Bool) :
   induction xs with
   | nil => simp [xorList]
   | cons b xs ih =>
-      cases b <;> simp [xorList, ih, boolF2_xor, boolF2, Nat.cast_add]
+      simp only [xorList]
+      rw [boolF2_xor, ih]
+      cases b <;> simp [boolF2]
 
 /-- Negative-sign bits of the active rank-one monomials at one coordinate. -/
 def activeNegatives
@@ -42,8 +44,9 @@ theorem informative_count_parity
     (hsum : ((k + n : Nat) : ZMod 3) = (t : ZMod 3))
     (hi : parityInformative k t = true) :
     (n : ZMod 2) = boolF2 (parityRhs k t) := by
+  have hval := congrArg (fun z : ZMod 3 => z.val) hsum
   interval_cases k <;> interval_cases n <;> interval_cases t <;>
-    norm_num [parityInformative, parityRhs, negativeResidue, boolF2] at *
+    norm_num [parityInformative, parityRhs, negativeResidue, boolF2] at hval ⊢
 
 /-- A satisfying `F₃` tensor assignment satisfies every parity equation emitted by the checker. -/
 theorem f3ParityEquation_sound
@@ -57,7 +60,9 @@ theorem f3ParityEquation_sound
     have hf : coordValid x = false := Bool.eq_false_of_not_eq_true h
     simp [f3ParityEquation, hf] at hrow
   have hbounds : coordA x < 16 ∧ coordB x < 16 ∧ coordC x < 16 := by
-    simpa [coordValid] using hv
+    have h1 := Bool.and_eq_true.mp hv
+    have h2 := Bool.and_eq_true.mp h1.1
+    exact ⟨of_decide_eq_true h2.1, of_decide_eq_true h2.2, of_decide_eq_true h1.2⟩
   let k := f3ActiveCount f edits x
   let t : Nat := if targetBit x then 1 else 0
   have hi : parityInformative k t = true := by
@@ -72,7 +77,7 @@ theorem f3ParityEquation_sound
   let negs := activeNegatives f edits signs x
   have hlen : negs.length = k := by
     simp [negs, activeNegatives, k, f3ActiveCount]
-  have hn : negs.count true ≤ negs.length := List.count_le_length _ _
+  have hn : negs.count true ≤ negs.length := List.count_le_length
   have hk : negs.length ≤ 4 := by
     rw [hlen]
     exact parityInformative_le_four hi
