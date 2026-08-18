@@ -28,9 +28,8 @@ theorem evalMask_xor (m n : Nat) (signs : Nat → Bool) :
   rw [← Finset.sum_add_distrib]
   apply Finset.sum_congr rfl
   intro v _
-  exact (by
-    cases hm : m.testBit v.val <;> cases hn : n.testBit v.val <;>
-      simp [hm, hn, boolF2] <;> decide)
+  cases hm : m.testBit v.val <;> cases hn : n.testBit v.val <;>
+    cases hs : signs v.val <;> simp [hm, hn, hs, boolF2] <;> decide
 
 /-- A shifted singleton mask selects exactly the corresponding sign variable. -/
 theorem evalMask_singleton (v : Nat) (hv : v < 2256) (signs : Nat → Bool) :
@@ -39,14 +38,14 @@ theorem evalMask_singleton (v : Nat) (hv : v < 2256) (signs : Nat → Bool) :
   let fv : Fin 2256 := ⟨v, hv⟩
   unfold evalMask
   rw [Finset.sum_eq_single fv]
-  · simp [fv, Nat.shiftLeft_eq, Nat.testBit_two_pow]
+  · simp [fv, Nat.shiftLeft_eq]
   · intro w _ hne
     have hvw : v ≠ w.val := by
       intro h
       apply hne
       apply Fin.ext
       exact h.symm
-    simp [Nat.shiftLeft_eq, Nat.testBit_two_pow, hvw]
+    simp [Nat.shiftLeft_eq, hvw]
   · intro h
     exact (h (Finset.mem_univ fv)).elim
 
