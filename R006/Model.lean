@@ -16,6 +16,10 @@ def coordA (x : Coord) : Nat := x.1
 def coordB (x : Coord) : Nat := x.2.1
 def coordC (x : Coord) : Nat := x.2.2
 
+/-- Bounds defining the 16×16×16 tensor-coordinate cube. -/
+def coordValid (x : Coord) : Bool :=
+  decide (coordA x < 16) && decide (coordB x < 16) && decide (coordC x < 16)
+
 def editQ (e : Edit) : Nat := e.1
 def editR (e : Edit) : Nat := e.2.1
 def editI (e : Edit) : Nat := e.2.2
