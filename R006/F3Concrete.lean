@@ -74,11 +74,13 @@ def f3CertificateAccum
     (f : Factors) (edits : Array Edit) (cert : Array Coord) : Option (Nat × Bool) :=
   f3CertificateAccumList f edits cert.toList
 
+/-- Tensor-coordinate bounds used by every released certificate. -/
+def coordValid (x : Coord) : Bool :=
+  (coordA x < 16) && (coordB x < 16) && (coordC x < 16)
+
 /-- Exact executable contradiction check for a list of F3 parity coordinates. -/
 def checkF3Certificate (f : Factors) (edits : Array Edit) (cert : Array Coord) : Bool :=
-  match f3CertificateAccum f edits cert with
-  | some (0, true) => true
-  | _ => false
+  cert.all coordValid && decide (f3CertificateAccum f edits cert = some (0, true))
 
 /-- Whether toggling one factor entry can change a monomial used by a certificate. -/
 def affectsCertificate
