@@ -169,6 +169,6 @@ theorem coverage_row_eq
   have h1 := Bool.and_eq_true_iff.mp h
   have h2 := Bool.and_eq_true_iff.mp h1.2
   have hall := List.all_eq_true.mp h2.2
-  exact hall first (List.mem_range.mpr hf)
+  simpa using hall first (List.mem_range.mpr hf)
 
 end R006
