@@ -5,6 +5,9 @@ namespace R006
 
 open GeneratedData
 
+set_option maxRecDepth 100000
+set_option maxHeartbeats 200000000
+
 /-- Whether rank-one term `r` is active at a tensor coordinate after support edits. -/
 def activeRank (f : Factors) (edits : Array Edit) (x : Coord) (r : Nat) : Bool :=
   factorBitAfter f edits 0 r (coordA x) &&
@@ -129,7 +132,7 @@ theorem activeRank_push_of_not_affectsCoordinate
         · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
           cases hc : factorBitAfter f edits 2 (editR e) (coordC x) <;>
           simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
-            hq0, hq1, hi, ha, hc] at h ⊢
+            hq1, hi, ha, hc] at h ⊢
         · have hi' : editI e ≠ coordB x := Ne.symm hi
           simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
             hq1, hi, hi'] at h ⊢
@@ -138,7 +141,7 @@ theorem activeRank_push_of_not_affectsCoordinate
           · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
             cases hb : factorBitAfter f edits 1 (editR e) (coordB x) <;>
             simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
-              hq0, hq1, hq2, hi, ha, hb] at h ⊢
+              hq2, hi, ha, hb] at h ⊢
           · have hi' : editI e ≠ coordC x := Ne.symm hi
             simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
               hq2, hi, hi'] at h ⊢
@@ -200,13 +203,11 @@ theorem checkF3Certificate_push_of_not_affects
   simpa [checkF3Certificate, hacc] using hcert
 
 /-- Every frozen AlphaTensor base-support parity row XORs to contradiction in Lean. -/
-set_option maxRecDepth 100000 in
 theorem alpha_f3_base_certificate_checked :
     checkF3Certificate alphaFactors #[] alphaF3BaseCertificate = true := by
   decide
 
 /-- Every frozen Kauers–Moosbauer base-support parity row XORs to contradiction in Lean. -/
-set_option maxRecDepth 100000 in
 theorem flips_f3_base_certificate_checked :
     checkF3Certificate flipsFactors #[] flipsF3BaseCertificate = true := by
   decide
@@ -215,15 +216,11 @@ private def checkEditCertificate (f : Factors) (item : EditCertificate) : Bool :
   checkF3Certificate f #[item.edit] item.equations
 
 /-- All 70 dedicated AlphaTensor distance-one certificates are reconstructed and checked in Lean. -/
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 200000000 in
 theorem alpha_f3_dedicated_distance1_checked :
     alphaF3EditCertificates.all (checkEditCertificate alphaFactors) = true := by
   decide
 
 /-- All 113 dedicated Kauers–Moosbauer distance-one certificates are reconstructed and checked in Lean. -/
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 200000000 in
 theorem flips_f3_dedicated_distance1_checked :
     flipsF3EditCertificates.all (checkEditCertificate flipsFactors) = true := by
   decide
