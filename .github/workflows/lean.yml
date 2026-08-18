@@ -48,7 +48,7 @@ jobs:
           set -euo pipefail
           lake env lean R006/F3CertificateSoundness.lean
           lake env lean R006/Mod4Lift.lean
-          lake env lean R006/F3PlanCore.lean
+          lake env lean R006/F3PlanSoundness.lean
       - name: Generate untrusted complete F3 proof plan
         run: |
           set -euo pipefail
