@@ -67,11 +67,15 @@ def checkMod4Certificate (f : Factors) (cert : Array Coord) : Bool :=
     certRhsXor f cert
 
 /-- The frozen 523-equation AlphaTensor mod-4 certificate is recomputed in Lean. -/
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 200000000 in
 theorem alpha_mod4_certificate_checked :
     checkMod4Certificate alphaFactors alphaMod4Certificate = true := by
   decide
 
 /-- The frozen 292-equation Kauers–Moosbauer mod-4 certificate is recomputed in Lean. -/
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 200000000 in
 theorem flips_mod4_certificate_checked :
     checkMod4Certificate flipsFactors flipsMod4Certificate = true := by
   decide
