@@ -51,7 +51,7 @@ def certRhsXor (f : Factors) (cert : Array Coord) : Bool :=
 
 /-- Executable check that all selected coordinates are valid, coefficients XOR to zero, and RHS XORs to one. -/
 def checkMod4Certificate (f : Factors) (cert : Array Coord) : Bool :=
-  cert.all coordValid &&
+  cert.toList.all coordValid &&
     (List.range (3 * 47 * 16)).all (fun v => !(certCoeffXor f cert v)) &&
     certRhsXor f cert
 
