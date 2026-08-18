@@ -7,7 +7,7 @@ theorem mod4_linearization
     (u v w x y z : ZMod 4) :
     (u + 2 * x) * (v + 2 * y) * (w + 2 * z) =
       u * v * w + 2 * (x * v * w + u * y * w + u * v * z) := by
-  ring
+  ring_nf
 
 /-- XOR/addition in `F₂` cannot turn a satisfied family of linear equations into `0 = 1`. -/
 theorem xor_contradiction_unsat
