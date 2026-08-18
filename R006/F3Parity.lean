@@ -14,10 +14,11 @@ theorem zmod3_nonzero_is_sign :
 /-- For a list of signs, the sum in `F₃` is `length + numberOfNegatives` modulo three. -/
 theorem sum_sign3_eq_length_add_count (xs : List Bool) :
     (xs.map sign3).sum = ((xs.length + xs.count true : ℕ) : ZMod 3) := by
+  have hneg : (-1 : ZMod 3) = 2 := by decide
   induction xs with
   | nil => simp
   | cons b xs ih =>
-      cases b <;> simp [sign3, ih, add_assoc, add_left_comm, add_comm] <;> norm_num
+      cases b <;> simp [sign3, ih, hneg, add_assoc, add_left_comm, add_comm]
 
 /-- A uniquely determined negative count forces its parity. -/
 theorem unique_negative_count_forces_parity
