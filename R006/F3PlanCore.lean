@@ -31,21 +31,25 @@ def checkGroups
     (f : Factors) (certs : Array (Array Coord)) (groups : Array PlanGroup) : Bool :=
   (List.range groups.size).all (fun gi =>
     let g := groups.getD gi { first := groups.size, cert := certs.size }
-    decide (g.first < 3 * 47 * 16) && decide (g.cert < certs.size) &&
-      checkF3Certificate f #[planEditAt g.first] (planCertAt certs g.cert))
+    decide (g.first < 3 * 47 * 16) &&
+      (decide (g.cert < certs.size) &&
+        checkF3Certificate f #[planEditAt g.first] (planCertAt certs g.cert)))
 
 def assignmentValid
     (f : Factors) (certs : Array (Array Coord)) (groups : Array PlanGroup)
     (first : Nat) (a : PlanAssignment) : Bool :=
-  decide (first < a.second) && decide (a.second < 3 * 47 * 16) &&
-    if a.direct then
-      decide (a.ref < certs.size) &&
-        checkF3Certificate f #[planEditAt first, planEditAt a.second] (planCertAt certs a.ref)
-    else
-      decide (a.ref < groups.size) &&
-        let g := groups.getD a.ref { first := groups.size, cert := certs.size }
-        (g.first == first) && decide (g.cert < certs.size) &&
-          !(affectsCertificate f #[planEditAt first] (planEditAt a.second) (planCertAt certs g.cert))
+  decide (first < a.second) &&
+    (decide (a.second < 3 * 47 * 16) &&
+      if a.direct then
+        decide (a.ref < certs.size) &&
+          checkF3Certificate f #[planEditAt first, planEditAt a.second] (planCertAt certs a.ref)
+      else
+        decide (a.ref < groups.size) &&
+          (let g := groups.getD a.ref { first := groups.size, cert := certs.size }
+           (g.first == first) &&
+             (decide (g.cert < certs.size) &&
+               !(affectsCertificate f #[planEditAt first] (planEditAt a.second)
+                 (planCertAt certs g.cert)))))
 
 def checkAssignments
     (f : Factors) (certs : Array (Array Coord)) (groups : Array PlanGroup)
@@ -71,18 +75,19 @@ def plannedSeconds (row : Array PlanAssignment) : List Nat :=
 def checkCoverageShape
     (f : Factors) (certs : Array (Array Coord)) (current : Array Nat)
     (assignments : Array (Array PlanAssignment)) : Bool :=
-  (current.size == 3 * 47 * 16) && (assignments.size == 3 * 47 * 16) &&
-    (List.range (3 * 47 * 16)).all (fun first =>
-      affectedSeconds f certs current first == plannedSeconds (assignments.getD first #[]))
+  (current.size == 3 * 47 * 16) &&
+    ((assignments.size == 3 * 47 * 16) &&
+      (List.range (3 * 47 * 16)).all (fun first =>
+        affectedSeconds f certs current first == plannedSeconds (assignments.getD first #[])))
 
 /-- Reflection checker for the complete radius-two parity-certificate proof plan. -/
 def checkRadiusTwoPlan
     (f : Factors) (certs : Array (Array Coord)) (current : Array Nat)
     (groups : Array PlanGroup) (assignments : Array (Array PlanAssignment)) : Bool :=
   checkCurrentCertificates f certs current &&
-    checkGroups f certs groups &&
-    checkAssignments f certs groups assignments &&
-    checkCoverageShape f certs current assignments
+    (checkGroups f certs groups &&
+      (checkAssignments f certs groups assignments &&
+        checkCoverageShape f certs current assignments))
 
 /-- Mathematical statement represented by a complete radius-two certificate plan. -/
 structure F3RadiusTwoObstruction (f : Factors) : Prop where
