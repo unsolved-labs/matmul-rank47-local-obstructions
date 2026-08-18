@@ -17,7 +17,7 @@ theorem sum_sign3_eq_length_add_count (xs : List Bool) :
   induction xs with
   | nil => simp
   | cons b xs ih =>
-      cases b <;> simp [sign3, ih, add_assoc, add_left_comm, add_comm]
+      cases b <;> simp [sign3, ih, add_assoc, add_left_comm, add_comm] <;> norm_num
 
 /-- A uniquely determined negative count forces its parity. -/
 theorem unique_negative_count_forces_parity
