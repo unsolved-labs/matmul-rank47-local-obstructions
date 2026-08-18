@@ -146,7 +146,9 @@ theorem checkMod4Certificate_no_linearized_solution
   have hmaskEval := eval_mod4CertificateMaskList f corr cert.toList hvalid
   have hlhs : (cert.toList.map (fun x => mod4RowValue f x corr)).sum = 0 := by
     rw [← hmaskEval]
-    simp [mod4CertificateMask, hmask]
+    change evalMask (mod4CertificateMask f cert) corr = 0
+    rw [hmask]
+    exact evalMask_zero corr
   have hsum := mod4Rows_solution_sum f cert.toList corr hrows
   have : (0 : ZMod 2) = 1 := by
     calc
