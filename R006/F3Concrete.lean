@@ -121,24 +121,27 @@ theorem activeRank_push_of_not_affectsCoordinate
         cases hc : factorBitAfter f edits 2 (editR e) (coordC x) <;>
         simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
           hq0, hi, hb, hc] at h ⊢
-      · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
-          hq0, hi] at h ⊢
+      · have hi' : editI e ≠ coordA x := Ne.symm hi
+        simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+          hq0, hi, hi'] at h ⊢
     · by_cases hq1 : editQ e = 1
       · by_cases hi : coordB x = editI e
         · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
           cases hc : factorBitAfter f edits 2 (editR e) (coordC x) <;>
           simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
             hq0, hq1, hi, ha, hc] at h ⊢
-        · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
-            hq0, hq1, hi] at h ⊢
+        · have hi' : editI e ≠ coordB x := Ne.symm hi
+          simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+            hq1, hi, hi'] at h ⊢
       · by_cases hq2 : editQ e = 2
         · by_cases hi : coordC x = editI e
           · cases ha : factorBitAfter f edits 0 (editR e) (coordA x) <;>
             cases hb : factorBitAfter f edits 1 (editR e) (coordB x) <;>
             simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
               hq0, hq1, hq2, hi, ha, hb] at h ⊢
-          · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
-              hq0, hq1, hq2, hi] at h ⊢
+          · have hi' : editI e ≠ coordC x := Ne.symm hi
+            simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
+              hq2, hi, hi'] at h ⊢
         · simp [activeRank, affectsCoordinate, factorBitAfter_push, editMatches,
             hq0, hq1, hq2] at h ⊢
   · exact activeRank_push_of_rank_ne f edits e x r hr
@@ -185,7 +188,7 @@ theorem f3CertificateAccum_push_of_not_affects
   apply f3CertificateAccumList_push_of_forall_not_affects
   intro x hx
   have hall := List.any_eq_false.mp h
-  exact hall x hx
+  exact Bool.eq_false_of_not_eq_true (hall x hx)
 
 /-- Hence a checked contradiction certificate remains checked after an unaffected support toggle. -/
 theorem checkF3Certificate_push_of_not_affects
