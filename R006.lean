@@ -4,4 +4,5 @@ import R006.ConcreteChecks
 import R006.F3Concrete
 import R006.F3Soundness
 import R006.F3Tensor
+import R006.F3CertificateSoundness
 import R006.F3Plan
