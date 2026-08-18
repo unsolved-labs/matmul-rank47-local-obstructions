@@ -46,11 +46,13 @@ theorem informative_count_parity
     (n : ZMod 2) = boolF2 (parityRhs k t) := by
   have hmod : (k + n) % 3 = t % 3 := by
     have hval := congrArg (fun z : ZMod 3 => z.val) hsum
+    rw [← Nat.cast_add] at hval
     simpa [ZMod.val_natCast] using hval
   apply ZMod.val_injective 2
-  interval_cases k <;> interval_cases n <;> interval_cases t <;>
-    norm_num [parityInformative, parityRhs, negativeResidue, boolF2,
-      ZMod.val_natCast] at hk hn ht hi hmod ⊢
+  interval_cases k <;> interval_cases n <;> interval_cases t
+  all_goals norm_num [parityInformative, negativeResidue] at hi
+  all_goals norm_num at hmod
+  all_goals norm_num [parityRhs, negativeResidue, boolF2, ZMod.val_natCast]
 
 /-- A satisfying `F₃` tensor assignment satisfies every parity equation emitted by the checker. -/
 theorem f3ParityEquation_sound
