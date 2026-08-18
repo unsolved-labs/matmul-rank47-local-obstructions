@@ -29,11 +29,21 @@ theorem expanded_mod4_row_forces_rhs
     l = boolF2 ((((s - t) / 2) % 2) == 1) := by
   rcases zmod2_zero_or_one l with h0 | h1
   · subst l
+    have hcast : (s : ZMod 4) = (t : ZMod 4) := by
+      simpa [doubleF2] using h
+    have hmod : s % 4 = t % 4 := by
+      have hval := congrArg (fun z : ZMod 4 => z.val) hcast
+      simpa [ZMod.val_natCast] using hval
     interval_cases s <;> interval_cases t <;>
-      norm_num [doubleF2, boolF2] at h ⊢
+      norm_num [boolF2] at hmod ⊢
   · subst l
+    have hcast : ((s + 2 : Nat) : ZMod 4) = (t : ZMod 4) := by
+      simpa [doubleF2, Nat.cast_add] using h
+    have hmod : (s + 2) % 4 = t % 4 := by
+      have hval := congrArg (fun z : ZMod 4 => z.val) hcast
+      simpa [ZMod.val_natCast] using hval
     interval_cases s <;> interval_cases t <;>
-      norm_num [doubleF2, boolF2] at h ⊢
+      norm_num [boolF2] at hmod ⊢
 
 /-- Every exact expanded lift equation satisfies the corresponding linearized `F₂` row. -/
 theorem coefficientwise_mod4_lift_row
