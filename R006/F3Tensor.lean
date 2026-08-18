@@ -12,6 +12,11 @@ theorem boolF2_xorList (xs : List Bool) :
       rw [boolF2_xor, ih]
       cases b <;> simp [boolF2, add_comm]
 
+/-- Canonical natural value of a Boolean embedded in `F₂`. -/
+theorem boolF2_val (b : Bool) :
+    (boolF2 b).val = if b then 1 else 0 := by
+  cases b <;> decide
+
 /-- Negative-sign bits of the active rank-one monomials at one coordinate. -/
 def activeNegatives
     (f : Factors) (edits : Array Edit) (signs : Nat → Bool) (x : Coord) : List Bool :=
@@ -46,13 +51,13 @@ theorem informative_count_parity
     (n : ZMod 2) = boolF2 (parityRhs k t) := by
   have hmod : (k + n) % 3 = t % 3 := by
     have hval := congrArg (fun z : ZMod 3 => z.val) hsum
-    rw [← Nat.cast_add] at hval
     simpa [ZMod.val_natCast] using hval
   apply ZMod.val_injective 2
+  rw [ZMod.val_natCast, boolF2_val]
   interval_cases k <;> interval_cases n <;> interval_cases t
   all_goals norm_num [parityInformative, negativeResidue] at hi
   all_goals norm_num at hmod
-  all_goals norm_num [parityRhs, negativeResidue, boolF2, ZMod.val_natCast]
+  all_goals norm_num [parityRhs, negativeResidue]
 
 /-- A satisfying `F₃` tensor assignment satisfies every parity equation emitted by the checker. -/
 theorem f3ParityEquation_sound
