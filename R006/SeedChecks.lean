@@ -2,6 +2,8 @@ import R006.ConcreteChecks
 
 namespace R006
 
+set_option maxRecDepth 100000
+
 /-- Enumerate the 16³ tensor-coordinate cube in lexicographic flattened order. -/
 def coordFromIndex (n : Nat) : Coord :=
   let a := n / (16 * 16)
@@ -24,11 +26,9 @@ theorem checkF2Seed_sound {f : Factors} (h : checkF2Seed f = true) : F2SeedValid
   intro n
   exact List.all_eq_true.mp h n.val (List.mem_range.mpr n.isLt)
 
-set_option maxRecDepth 100000 in
 theorem alpha_f2_seed_checked : checkF2Seed GeneratedData.alphaFactors = true := by
   decide
 
-set_option maxRecDepth 100000 in
 theorem flips_f2_seed_checked : checkF2Seed GeneratedData.flipsFactors = true := by
   decide
 
