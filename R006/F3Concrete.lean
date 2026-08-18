@@ -25,10 +25,10 @@ def negativeResidue (k t : Nat) : Nat :=
 /-- The exact bounded-coordinate criterion used to emit an F3 parity equation. -/
 def parityInformative (k t : Nat) : Bool :=
   if k == 0 then t == 1
-  else if k > 4 then false
+  else if decide (k > 4) then false
   else
     let n := negativeResidue k t
-    (n <= k) && (n + 3 > k)
+    decide (n <= k) && decide (n + 3 > k)
 
 /-- Forced parity of the number of negative active monomials. -/
 def parityRhs (k t : Nat) : Bool :=
@@ -76,7 +76,7 @@ def f3CertificateAccum
 
 /-- Tensor-coordinate bounds used by every released certificate. -/
 def coordValid (x : Coord) : Bool :=
-  (coordA x < 16) && (coordB x < 16) && (coordC x < 16)
+  decide (coordA x < 16) && decide (coordB x < 16) && decide (coordC x < 16)
 
 /-- Exact executable contradiction check for a list of F3 parity coordinates. -/
 def checkF3Certificate (f : Factors) (edits : Array Edit) (cert : Array Coord) : Bool :=
