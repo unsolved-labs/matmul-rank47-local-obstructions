@@ -39,12 +39,20 @@ def parityRhs (k t : Nat) : Bool :=
 def variableIndex (q r i : Nat) : Nat :=
   (q * 47 + r) * 16 + i
 
+/-- Three sign-variable bits occurring in one active rank-one monomial. -/
+def rankParityMask (x : Coord) (r : Nat) : Nat :=
+  (1 <<< variableIndex 0 r (coordA x)) ^^^
+    (1 <<< variableIndex 1 r (coordB x)) ^^^
+    (1 <<< variableIndex 2 r (coordC x))
+
+/-- XOR mask contributed by a list of active rank-one terms. -/
+def ranksParityMask (x : Coord) : List Nat → Nat
+  | [] => 0
+  | r :: rs => rankParityMask x r ^^^ ranksParityMask x rs
+
 /-- Fixed-space 2,256-bit coefficient mask for one necessary F3 parity equation. -/
 def f3ParityMask (f : Factors) (edits : Array Edit) (x : Coord) : Nat :=
-  (activeRanks f edits x).foldl (fun mask r =>
-    mask ^^^ (1 <<< variableIndex 0 r (coordA x)) ^^^
-      (1 <<< variableIndex 1 r (coordB x)) ^^^
-      (1 <<< variableIndex 2 r (coordC x))) 0
+  ranksParityMask x (activeRanks f edits x)
 
 /-- Reconstruct one necessary parity equation, when the negative count is uniquely determined. -/
 def f3ParityEquation (f : Factors) (edits : Array Edit) (x : Coord) : Option (Nat × Bool) :=
