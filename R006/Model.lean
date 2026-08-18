@@ -27,9 +27,33 @@ def editI (e : Edit) : Nat := e.2.2
 def editMatches (e : Edit) (q r i : Nat) : Bool :=
   (editQ e == q) && (editR e == r) && (editI e == i)
 
+private def applyEditBit (q r i : Nat) (b : Bool) (e : Edit) : Bool :=
+  if editMatches e q r i then !b else b
+
 /-- Support bit after applying a finite list of factor-entry toggles. -/
 def factorBitAfter (f : Factors) (edits : Array Edit) (q r i : Nat) : Bool :=
-  edits.foldl (fun b e => if editMatches e q r i then !b else b) (factorBit f q r i)
+  edits.toList.foldl (applyEditBit q r i) (factorBit f q r i)
+
+@[simp] theorem factorBitAfter_empty (f : Factors) (q r i : Nat) :
+    factorBitAfter f #[] q r i = factorBit f q r i := by
+  rfl
+
+/-- Appending one support edit toggles exactly its named factor entry. -/
+theorem factorBitAfter_push (f : Factors) (edits : Array Edit) (e : Edit) (q r i : Nat) :
+    factorBitAfter f (edits.push e) q r i =
+      if editMatches e q r i then !(factorBitAfter f edits q r i)
+      else factorBitAfter f edits q r i := by
+  simp [factorBitAfter, applyEditBit, List.foldl_append]
+
+/-- An edit with a different rank index leaves this factor bit unchanged. -/
+theorem factorBitAfter_push_of_rank_ne
+    (f : Factors) (edits : Array Edit) (e : Edit) (q r i : Nat)
+    (hr : editR e ≠ r) :
+    factorBitAfter f (edits.push e) q r i = factorBitAfter f edits q r i := by
+  rw [factorBitAfter_push]
+  have hm : editMatches e q r i = false := by
+    simp [editMatches, hr]
+  simp [hm]
 
 /-- The 4×4 matrix-multiplication target bit at flattened tensor coordinate `(a,b,c)`. -/
 def targetBit (x : Coord) : Bool :=
