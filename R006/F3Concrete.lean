@@ -54,11 +54,17 @@ def ranksParityMask (x : Coord) : List Nat → Nat
 def f3ParityMask (f : Factors) (edits : Array Edit) (x : Coord) : Nat :=
   ranksParityMask x (activeRanks f edits x)
 
-/-- Reconstruct one necessary parity equation, when the negative count is uniquely determined. -/
+/-- Tensor-coordinate bounds used by every released certificate. -/
+def coordValid (x : Coord) : Bool :=
+  decide (coordA x < 16) && decide (coordB x < 16) && decide (coordC x < 16)
+
+/-- Reconstruct one necessary parity equation, when both the coordinate and the negative-count reduction are valid. -/
 def f3ParityEquation (f : Factors) (edits : Array Edit) (x : Coord) : Option (Nat × Bool) :=
-  let k := f3ActiveCount f edits x
-  let t := if targetBit x then 1 else 0
-  if parityInformative k t then some (f3ParityMask f edits x, parityRhs k t) else none
+  if coordValid x then
+    let k := f3ActiveCount f edits x
+    let t := if targetBit x then 1 else 0
+    if parityInformative k t then some (f3ParityMask f edits x, parityRhs k t) else none
+  else none
 
 /-- Recursive accumulator for a parity contradiction certificate. -/
 def f3CertificateAccumList
@@ -74,13 +80,9 @@ def f3CertificateAccum
     (f : Factors) (edits : Array Edit) (cert : Array Coord) : Option (Nat × Bool) :=
   f3CertificateAccumList f edits cert.toList
 
-/-- Tensor-coordinate bounds used by every released certificate. -/
-def coordValid (x : Coord) : Bool :=
-  decide (coordA x < 16) && decide (coordB x < 16) && decide (coordC x < 16)
-
 /-- Exact executable contradiction check for a list of F3 parity coordinates. -/
 def checkF3Certificate (f : Factors) (edits : Array Edit) (cert : Array Coord) : Bool :=
-  cert.all coordValid && decide (f3CertificateAccum f edits cert = some (0, true))
+  decide (f3CertificateAccum f edits cert = some (0, true))
 
 /-- Whether toggling one factor entry can change a monomial used by a certificate. -/
 def affectsCertificate
